@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Gabarito, Sora, IBM_Plex_Mono } from "next/font/google";
 import { SiteNav } from "@/components/nav";
+import { MotionProvider } from "@/components/motion";
 import "./globals.css";
 
 const display = Gabarito({
@@ -35,8 +36,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[--color-bg] text-[--color-text] font-body">
-        <SiteNav />
-        {children}
+        <MotionProvider>
+          <SiteNav />
+          {children}
+        </MotionProvider>
       </body>
     </html>
   );

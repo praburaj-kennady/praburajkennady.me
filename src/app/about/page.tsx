@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/footer";
+import { Reveal } from "@/components/motion";
 import { experience, profile } from "@/content/site";
 
 export const metadata: Metadata = {
@@ -46,25 +47,26 @@ export default function About() {
         </div>
 
         <section aria-labelledby="exp-heading" className="mt-16">
-          <h2 id="exp-heading" className="font-display text-d3">
-            Experience
-          </h2>
+          <Reveal>
+            <h2 id="exp-heading" className="font-display text-d3">
+              Experience
+            </h2>
+          </Reveal>
           <div className="mt-6 flex flex-col gap-8">
             {experience.map((e) => (
-              <article
-                key={e.company}
-                className="border-t border-border pt-6"
-              >
-                <p className="eyebrow">{e.period}</p>
-                <h3 className="mt-2 font-display text-xl font-medium">
-                  {e.role} · {e.company}
-                </h3>
-                <ul className="mt-3 flex max-w-(--container-prose) list-disc flex-col gap-2 pl-5 text-base text-text-muted">
-                  {e.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </article>
+              <Reveal key={e.company}>
+                <article className="border-t border-border pt-6">
+                  <p className="eyebrow">{e.period}</p>
+                  <h3 className="mt-2 font-display text-xl font-medium">
+                    {e.role} · {e.company}
+                  </h3>
+                  <ul className="mt-3 flex max-w-(--container-prose) list-disc flex-col gap-2 pl-5 text-base text-text-muted">
+                    {e.bullets.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
+                </article>
+              </Reveal>
             ))}
           </div>
         </section>
