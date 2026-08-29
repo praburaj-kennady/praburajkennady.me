@@ -1,43 +1,47 @@
+import Link from "next/link";
+import { SiteFooter } from "@/components/footer";
+import { ProjectCard } from "@/components/project-card";
+import { profile, projects } from "@/content/site";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-24">
-      <p className="eyebrow">design system v0.3 · smoke test</p>
+    <>
+      <main className="flex-1 px-6 sm:px-12">
+        {/* Hero fold — sized so the works list peeks above the fold */}
+        <section className="flex min-h-[70svh] flex-col items-center justify-center gap-6 text-center">
+          <p className="eyebrow">product designer · zoho</p>
+          <h1 className="font-display text-d1 max-w-[14ch] text-balance">
+            {profile.name}
+          </h1>
+          <p className="max-w-(--container-prose) text-lg text-text-muted">
+            {profile.tagline}
+            <br />
+            {profile.taglineDetail}
+          </p>
+          <Link
+            href="/about"
+            className="text-accent underline hover:text-accent-hover"
+          >
+            More about me
+          </Link>
+        </section>
 
-      <h1 className="font-display text-d1 text-center max-w-[16ch] text-balance">
-        praburaj kennady
-      </h1>
-
-      <p className="text-lg text-text-muted text-center max-w-(--container-prose)">
-        Product designer shipping designs into products with AI. Five years
-        across consumer and enterprise, on Android, iOS, and TV.
-      </p>
-
-      <div className="flex items-center gap-4">
-        {/* the yellow button — sand-950 on marigold-300, 10.22:1 AAA */}
-        <a
-          href="#"
-          className="rounded-full bg-brand-surface px-8 py-3.5 font-medium text-text-on-accent"
+        {/* Works */}
+        <section
+          aria-labelledby="works-heading"
+          className="mx-auto max-w-4xl pb-8"
         >
-          Resume
-        </a>
-        {/* text link — accent 5.38:1 AA, underlined */}
-        <a href="#" className="text-accent underline hover:text-accent-hover">
-          More about me
-        </a>
-      </div>
-
-      <div className="flex gap-2">
-        {/* category tags — colour is decoration, the label carries meaning */}
-        <span className="rounded-full bg-brand-soft px-3 py-1 text-sm text-brand-on-surface">
-          case study
-        </span>
-        <span className="rounded-full bg-jade-100 px-3 py-1 text-sm text-jade-800">
-          shipped
-        </span>
-        <span className="rounded-full bg-violet-100 px-3 py-1 text-sm text-violet-800">
-          craft
-        </span>
-      </div>
-    </main>
+          <h2 id="works-heading" className="font-display text-d2 mb-8">
+            Works
+          </h2>
+          <div className="flex flex-col gap-6">
+            {projects.map((p) => (
+              <ProjectCard key={p.slug} project={p} />
+            ))}
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

@@ -103,6 +103,14 @@
   --border: var(--sand-300); /* decorative only (1.4.11 exempt) */
   --border-strong: var(--sand-600); /* meaningful boundaries, 3.65:1 */
   --focus: var(--ultramarine-700);
+
+  /* category tag pairs — colour is decoration, the label carries meaning */
+  --tag-jade-bg: var(--jade-100);
+  --tag-jade-ink: var(--jade-800);
+  --tag-coral-bg: var(--coral-100);
+  --tag-coral-ink: var(--coral-800);
+  --tag-violet-bg: var(--violet-100);
+  --tag-violet-ink: var(--violet-800);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -124,6 +132,13 @@
     --border: var(--sand-800);
     --border-strong: var(--sand-600); /* 4.23:1 AA */
     --focus: var(--ultramarine-300);
+
+    --tag-jade-bg: var(--jade-900);
+    --tag-jade-ink: var(--jade-200);
+    --tag-coral-bg: var(--coral-900);
+    --tag-coral-ink: var(--coral-200);
+    --tag-violet-bg: var(--violet-900);
+    --tag-violet-ink: var(--violet-200);
   }
 }
 
@@ -151,14 +166,13 @@
   --color-border-strong: var(--border-strong);
   --color-focus: var(--focus);
 
-  /* accent family primitives stay reachable for category tags
-     (coral/jade/violet chips) — usage rules live in design-system.md */
-  --color-coral-100: var(--coral-100);
-  --color-coral-800: var(--coral-800);
-  --color-jade-100: var(--jade-100);
-  --color-jade-800: var(--jade-800);
-  --color-violet-100: var(--violet-100);
-  --color-violet-800: var(--violet-800);
+  /* category tag pairs — mode-aware (light: 100/800, dark: 900/200) */
+  --color-tag-jade-bg: var(--tag-jade-bg);
+  --color-tag-jade-ink: var(--tag-jade-ink);
+  --color-tag-coral-bg: var(--tag-coral-bg);
+  --color-tag-coral-ink: var(--tag-coral-ink);
+  --color-tag-violet-bg: var(--tag-violet-bg);
+  --color-tag-violet-ink: var(--tag-violet-ink);
 
   /* type scale */
   --text-d1: clamp(2.5rem, 7.5vw, 4.75rem);
