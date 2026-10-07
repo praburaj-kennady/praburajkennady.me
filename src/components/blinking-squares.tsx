@@ -28,7 +28,8 @@ export interface BlinkingSquaresProps {
   falloff?: number;
   /** Lowest resting brightness of a lit square (0–1). */
   minBrightness?: number;
-  /** Twinkles per second for an average square (0 freezes the field). */
+  /** Twinkle rate, in radians per second: 1.4 is about one slow
+      twinkle every 4.5 seconds (0 freezes the field). */
   twinkleSpeed?: number;
   /** How far a square dims at the bottom of its twinkle (0–1). */
   twinkleStrength?: number;
@@ -125,7 +126,7 @@ export function BlinkingSquares({
             j * cell + inset,
             rest,
             hash(i, j, 3) * Math.PI * 2,
-            0.5 + hash(i, j, 4),
+            0.8 + hash(i, j, 4) * 0.4,
           );
         }
       }
@@ -138,7 +139,7 @@ export function BlinkingSquares({
       const seconds = time / 1000;
       const strength = clamp(twinkleStrength, 0, 1);
       for (let n = 0; n < squares.length; n += 5) {
-        const wave = 0.5 + 0.5 * Math.sin(seconds * twinkleSpeed * squares[n + 4] * Math.PI * 2 + squares[n + 3]);
+        const wave = 0.5 + 0.5 * Math.sin(seconds * twinkleSpeed * squares[n + 4] + squares[n + 3]);
         const brightness = squares[n + 2] * (1 - strength * wave);
         ctx.globalAlpha = clamp(brightness * opacity, 0, 1);
         ctx.fillRect(squares[n], squares[n + 1], size, size);
