@@ -13,7 +13,7 @@ export default function Home() {
         squareSize={0.6}
         fadeStart={0.6}
         twinkleSpeed={0.8}
-        opacity={0.35}
+        opacity={0.55}
       />
       <h1>Building. Breaking. Rebuilding.</h1>
     </main>
