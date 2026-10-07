@@ -141,6 +141,7 @@
 @layer components {
   /* The one page: a single message, centred in the window. */
   .holding {
+    position: relative;
     display: grid;
     place-items: center;
     min-height: 100vh;
@@ -149,6 +150,14 @@
     text-align: center;
   }
   .holding h1 {
+    position: relative;
     margin: 0;
+  }
+  .holding-squares {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
   }
 }
