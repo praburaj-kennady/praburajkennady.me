@@ -9,6 +9,8 @@ export default function Home() {
       <BlinkingSquares
         className="holding-squares"
         direction="bottom"
+        cellSize={10}
+        squareSize={0.6}
         fadeStart={0.6}
         twinkleSpeed={0.8}
         opacity={0.35}
