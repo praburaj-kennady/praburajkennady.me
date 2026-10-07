@@ -14,7 +14,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Praburaj Kennady — Product Designer",
   description:
-    "Product designer shipping designs into products with AI. Case studies coming soon.",
+    "Product designer shipping designs into products with AI. This site is being built.",
 };
 
 export const viewport: Viewport = {
