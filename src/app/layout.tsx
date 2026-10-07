@@ -1,46 +1,30 @@
-import type { Metadata } from "next";
-import { Gabarito, Sora, IBM_Plex_Mono } from "next/font/google";
-import { SiteNav } from "@/components/nav";
-import { MotionProvider } from "@/components/motion";
+import type { Metadata, Viewport } from "next";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 
-const display = Gabarito({
+/* Nunito in the four weights the style uses. next/font serves the files
+   from this site, so no request goes to Google. */
+const nunito = Nunito({
   subsets: ["latin"],
-  variable: "--font-gabarito",
-  display: "swap",
-});
-
-const body = Sora({
-  subsets: ["latin"],
-  variable: "--font-sora",
-  display: "swap",
-});
-
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-plex-mono",
+  weight: ["500", "700", "800", "900"],
+  variable: "--font-nunito",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Praburaj Kennady — Product Designer",
   description:
-    "Product designer shipping designs into products with AI. Five years across consumer and enterprise, on Android, iOS, and TV.",
+    "Product designer shipping designs into products with AI. Case studies coming soon.",
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-[--color-bg] text-[--color-text] font-body">
-        <MotionProvider>
-          <SiteNav />
-          {children}
-        </MotionProvider>
-      </body>
+    <html lang="en" className={`${nunito.variable} antialiased`}>
+      <body>{children}</body>
     </html>
   );
 }

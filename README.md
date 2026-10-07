@@ -1,15 +1,14 @@
 # praburajkennady.me
 
-My personal portfolio website showcasing my projects, skills, and experience.
+My personal portfolio website. For now it's a single page: Works, coming soon.
 
-Built with [Next.js](https://nextjs.org), Tailwind CSS v4 and [Motion](https://motion.dev) — designed in Figma, shipped by directing Claude through the build.
+Built with [Next.js](https://nextjs.org) and Tailwind CSS v4, in the style of the Zwap site — designed in Figma, shipped by directing Claude through the build.
 
 ## Stack
 
 - **Framework** — Next.js (App Router, TypeScript)
-- **Styling** — Tailwind v4; design tokens in `src/app/globals.css` (six OKLCH colour ramps + semantic light/dark theme, spec in `design-system.md`)
-- **Type** — Gabarito (display) · Sora (body) · IBM Plex Mono (utility), via `next/font`
-- **Motion** — shared presets in `src/lib/motion.ts`; respects `prefers-reduced-motion`
+- **Styling** — Tailwind v4; design tokens in `src/app/globals.css` (day and night colours that follow the system, with `data-theme` to override)
+- **Type** — Nunito (500, 700, 800, 900), via `next/font`
 
 ## Develop
 

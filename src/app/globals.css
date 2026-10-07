@@ -1,229 +1,244 @@
 @import "tailwindcss";
 
 /* ————————————————————————————————————————————————————————————————
-   Design system v0.3 — colour & type
-   Source of truth: design-system.md + Figma "Primitives"/"Theme"
-   Ramps generated in OKLCH at fixed perceptual lightness steps.
-   Semantic tokens flip via prefers-color-scheme (see .dark override).
+   The site's style, taken from the Zwap site (style-guide.md).
+   One column, Nunito, near-white or near-black grounds, one soft grey
+   for raised panels, and one blue kept for links and focus.
+   Sizes are in rem, so a reader's default font size applies too.
    ———————————————————————————————————————————————————————————————— */
 
+/* Day, then night: by the system, unless data-theme says otherwise. */
 :root {
-  /* —— primitives · sand (neutral, 85°) —— */
-  --sand-50: #faf6ee;
-  --sand-100: #f0ebe2;
-  --sand-200: #e2ddd3;
-  --sand-300: #d1cbc0;
-  --sand-400: #b6b0a3;
-  --sand-500: #9e978a;
-  --sand-600: #868072;
-  --sand-700: #6c6659;
-  --sand-800: #524d42;
-  --sand-900: #39352c;
-  --sand-950: #211e18;
-
-  /* —— primitives · marigold (brand, 85°) — surface only, never text —— */
-  --marigold-50: #fff6e2;
-  --marigold-100: #fceac4;
-  --marigold-200: #fcda93;
-  --marigold-300: #f9c345;
-  --marigold-400: #dea700;
-  --marigold-500: #bf9000;
-  --marigold-600: #a27900;
-  --marigold-700: #816106;
-  --marigold-800: #62490b;
-  --marigold-900: #43320a;
-  --marigold-950: #271d05;
-
-  /* —— primitives · ultramarine (links/actions, 264°) —— */
-  --ultramarine-50: #f2f7ff;
-  --ultramarine-100: #e2ecff;
-  --ultramarine-200: #cedfff;
-  --ultramarine-300: #b3ccff;
-  --ultramarine-400: #89afff;
-  --ultramarine-500: #6a95f0;
-  --ultramarine-600: #597ecc;
-  --ultramarine-700: #4764a3;
-  --ultramarine-800: #364c7b;
-  --ultramarine-900: #253454;
-  --ultramarine-950: #141e32;
-
-  /* —— primitives · coral (tag/destructive, 32°) —— */
-  --coral-50: #fff4f1;
-  --coral-100: #ffe5e0;
-  --coral-200: #ffd2c9;
-  --coral-300: #ffb8a9;
-  --coral-400: #ff8b75;
-  --coral-500: #de7662;
-  --coral-600: #bc6352;
-  --coral-700: #974f41;
-  --coral-800: #723c32;
-  --coral-900: #4e2922;
-  --coral-950: #2e1712;
-
-  /* —— primitives · jade (tag/success, 162°) —— */
-  --jade-50: #e8fcf1;
-  --jade-100: #d3f6e3;
-  --jade-200: #aeefce;
-  --jade-300: #78e5b3;
-  --jade-400: #55ca97;
-  --jade-500: #49ae82;
-  --jade-600: #3c936d;
-  --jade-700: #317657;
-  --jade-800: #265942;
-  --jade-900: #1b3d2d;
-  --jade-950: #0e2319;
-
-  /* —— primitives · violet (tag, 305°) —— */
-  --violet-50: #f9f4ff;
-  --violet-100: #f1e6ff;
-  --violet-200: #e7d5ff;
-  --violet-300: #dabcff;
-  --violet-400: #c895ff;
-  --violet-500: #ad7fde;
-  --violet-600: #926bbc;
-  --violet-700: #755597;
-  --violet-800: #584172;
-  --violet-900: #3c2c4e;
-  --violet-950: #23192e;
-
-  /* —— semantic · light (verified pairings in design-system.md) —— */
-  --bg: var(--sand-50); /* base                        */
-  --surface: var(--sand-100); /* cards, wells                */
-  --text: var(--sand-900); /* 11.33:1 AAA                 */
-  --text-muted: var(--sand-700); /*  5.29:1 AA                  */
-  --text-faint: var(--sand-700); /* two tiers in light mode     */
-  --accent: var(--ultramarine-700); /*  5.38:1 AA                  */
-  --accent-hover: var(--ultramarine-800); /*  7.87:1 AAA                 */
-  --accent-surface: var(--ultramarine-100);
-  --accent-on-surface: var(--ultramarine-800); /* 7.14:1 AAA on accent-surface */
-  --brand-surface: var(--marigold-300); /* the yellow button           */
-  --brand-soft: var(--marigold-100); /* the yellow tag              */
-  --brand-on-surface: var(--marigold-800); /* 7.15:1 AAA on brand-soft    */
-  --text-on-accent: var(--sand-950); /* 10.22:1 AAA on brand-surface */
-  --border: var(--sand-300); /* decorative only (1.4.11 exempt) */
-  --border-strong: var(--sand-600); /* meaningful boundaries, 3.65:1 */
-  --focus: var(--ultramarine-700);
-
-  /* category tag pairs — colour is decoration, the label carries meaning */
-  --tag-jade-bg: var(--jade-100);
-  --tag-jade-ink: var(--jade-800);
-  --tag-coral-bg: var(--coral-100);
-  --tag-coral-ink: var(--coral-800);
-  --tag-violet-bg: var(--violet-100);
-  --tag-violet-ink: var(--violet-800);
+  --base: #ffffff;
+  --raised: #f5f5f7;
+  --inverse: #111111;
+  --text: #111111; /* 18.9:1 on base */
+  --text-2: #555555; /*  7.5:1 */
+  --muted: #6e6e73; /*  5.1:1 */
+  --line: #e5e5ea; /* decorative only */
+  --accent: #0657dc; /*  6.2:1 */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --base: #0a0a0a;
+    --raised: #1c1c1e;
+    --inverse: #f5f5f5;
+    --text: #f5f5f5; /* 18.2:1 */
+    --text-2: #aeaeb2; /*  9.0:1 */
+    --muted: #8a8a8f; /*  5.8:1 */
+    --line: #38383a;
+    --accent: #5896ff; /*  6.8:1 */
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --base: #0a0a0a;
+  --raised: #1c1c1e;
+  --inverse: #f5f5f5;
+  --text: #f5f5f5;
+  --text-2: #aeaeb2;
+  --muted: #8a8a8f;
+  --line: #38383a;
+  --accent: #5896ff;
+  color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* —— semantic · dark —— */
-    --bg: var(--sand-950);
-    --surface: var(--sand-900);
-    --text: var(--sand-100); /* 14.00:1 AAA */
-    --text-muted: var(--sand-300); /* 10.30:1 AAA */
-    --text-faint: var(--sand-400); /*  7.70:1 AAA — third tier returns */
-    --accent: var(--ultramarine-300); /* 10.29:1 AAA */
-    --accent-hover: var(--ultramarine-200); /* 12.36:1 AAA */
-    --accent-surface: var(--ultramarine-900);
-    --accent-on-surface: var(--ultramarine-200);
-    --brand-surface: var(--marigold-400); /* text-on-accent 7.62:1 AAA */
-    --brand-soft: var(--marigold-900);
-    --brand-on-surface: var(--marigold-200);
-    --text-on-accent: var(--sand-950);
-    --border: var(--sand-800);
-    --border-strong: var(--sand-600); /* 4.23:1 AA */
-    --focus: var(--ultramarine-300);
+/* The tokens as Tailwind utilities (bg-raised, text-muted, …). */
+@theme inline {
+  --font-sans: var(--font-nunito), ui-rounded, -apple-system, system-ui,
+    "Segoe UI", sans-serif;
+  --color-base: var(--base);
+  --color-raised: var(--raised);
+  --color-inverse: var(--inverse);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+}
 
-    --tag-jade-bg: var(--jade-900);
-    --tag-jade-ink: var(--jade-200);
-    --tag-coral-bg: var(--coral-900);
-    --tag-coral-ink: var(--coral-200);
-    --tag-violet-bg: var(--violet-900);
-    --tag-violet-ink: var(--violet-200);
+@layer base {
+  /* The gutter is kept on short pages too, so nothing steps sideways
+     between a page that scrolls and one that fits. */
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: stable;
+  }
+  body {
+    margin: 0;
+    background: var(--base);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-weight: 900;
+    font-size: 2.125rem; /* 34px */
+    line-height: 2.5rem;
+    letter-spacing: -0.5px;
+    margin: 40px 0 6px;
+    text-wrap: balance;
+  }
+  h2 {
+    font-weight: 800;
+    font-size: 1.375rem; /* 22px */
+    line-height: 1.75rem;
+    letter-spacing: -0.2px;
+    margin: 40px 0 6px;
+    text-wrap: balance;
+  }
+  h3 {
+    font-weight: 800;
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.5rem;
+    margin: 28px 0 4px;
+    text-wrap: balance;
+  }
+  p,
+  li {
+    color: var(--text-2);
+  }
+  p {
+    margin: 0 0 14px;
+  }
+  ul {
+    list-style: disc;
+    padding-left: 1.2em;
+    margin: 0 0 14px;
+  }
+  li {
+    margin: 4px 0;
+  }
+  strong {
+    color: var(--text);
+    font-weight: 800;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  /* Focus is always visible: 3px of accent, 3px out. */
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.75rem; /* 28px */
+      line-height: 2.125rem;
+    }
   }
 }
 
-@theme inline {
-  /* fonts — layout.tsx wires the next/font variables */
-  --font-display: var(--font-gabarito), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+@layer components {
+  .page {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 28px 20px 56px;
+  }
 
-  /* semantic colours → Tailwind utilities (bg-bg, text-text-muted, …) */
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-text: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-text-faint: var(--text-faint);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-surface: var(--accent-surface);
-  --color-accent-on-surface: var(--accent-on-surface);
-  --color-brand-surface: var(--brand-surface);
-  --color-brand-soft: var(--brand-soft);
-  --color-brand-on-surface: var(--brand-on-surface);
-  --color-text-on-accent: var(--text-on-accent);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-focus: var(--focus);
+  .lede {
+    font-size: 1.1875rem; /* 19px */
+    line-height: 1.55;
+    color: var(--text);
+  }
+  /* The mark: the portfolio's "pk.", set in Nunito Black. */
+  .mark {
+    display: block;
+    color: var(--text);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
 
-  /* category tag pairs — mode-aware (light: 100/800, dark: 900/200) */
-  --color-tag-jade-bg: var(--tag-jade-bg);
-  --color-tag-jade-ink: var(--tag-jade-ink);
-  --color-tag-coral-bg: var(--tag-coral-bg);
-  --color-tag-coral-ink: var(--tag-coral-ink);
-  --color-tag-violet-bg: var(--tag-violet-bg);
-  --color-tag-violet-ink: var(--tag-violet-ink);
+  /* Pill buttons: grey, centred in a row, 12px apart. */
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 28px 0 0;
+  }
+  .pill {
+    background: var(--raised);
+    color: var(--text);
+    font-weight: 800;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 999px;
+    transition:
+      background-color 150ms ease,
+      transform 160ms var(--ease-out);
+  }
+  .pill:active {
+    transform: scale(0.97);
+  }
 
-  /* type scale */
-  --text-d1: clamp(2.5rem, 7.5vw, 4.75rem);
-  --text-d1--line-height: 1;
-  --text-d1--letter-spacing: -0.025em;
-  --text-d1--font-weight: 600;
-  --text-d2: clamp(1.875rem, 4.5vw, 2.75rem);
-  --text-d2--line-height: 1.06;
-  --text-d2--letter-spacing: -0.02em;
-  --text-d2--font-weight: 600;
-  --text-d3: clamp(1.375rem, 2.4vw, 1.5rem);
-  --text-d3--line-height: 1.15;
-  --text-d3--letter-spacing: -0.015em;
-  --text-d3--font-weight: 500;
-  --text-lg: 1.25rem;
-  --text-lg--line-height: 1.55;
-  --text-md: 1.0625rem;
-  --text-md--line-height: 1.72;
-  --text-base: 1rem;
-  --text-base--line-height: 1.65;
-  --text-sm: 0.875rem;
-  --text-sm--line-height: 1.6;
-  --text-util: 0.75rem; /* 12px is a floor, not a suggestion */
-  --text-util--line-height: 1.45;
-  --text-util--letter-spacing: 0.12em;
-  --text-util--font-weight: 500;
+  @media (hover: hover) and (pointer: fine) {
+    .pill:hover {
+      background: var(--line);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pill:active {
+      transform: none;
+    }
+  }
 
-  /* prose measure */
-  --container-prose: 62ch;
+  /* The home page fills the window: the hero stands midway between the
+     top and the footer's rule, the footer at the window's foot. In a
+     window too short for both, it scrolls. */
+  .home {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .home main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hero {
+    text-align: center;
+    padding: 56px 0 28px;
+  }
+  .hero .mark {
+    font-size: clamp(5rem, 22vw, 8rem);
+    margin: 0 auto 24px;
+  }
+  .hero h1 {
+    margin-top: 0;
+  }
+  .hero .lede {
+    max-width: 32rem;
+    margin: 12px auto 0;
+  }
+
+  .site-footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+  .site-footer p {
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .site-footer a {
+    color: var(--text-2);
+  }
 }
 
-/* —— base —— */
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-}
-
-/* Focus is 2px + 2px offset, always. Never outline: none. */
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-
-/* Utility label helper — 12px mono uppercase in text-muted (not faint:
-   the v0.2 eyebrow fix) */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: var(--text-util);
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
