@@ -2,7 +2,7 @@
 export default function Home() {
   return (
     <main className="holding">
-      <h1>Building in progress…</h1>
+      <h1>Building. Breaking. Rebuilding.</h1>
     </main>
   );
 }

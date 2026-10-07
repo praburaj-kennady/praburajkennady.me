@@ -1,6 +1,6 @@
 # praburajkennady.me
 
-My personal portfolio website. For now it's a single holding page: Building in progress…
+My personal portfolio website. For now it's a single holding page: Building. Breaking. Rebuilding.
 
 Built with [Next.js](https://nextjs.org) and Tailwind CSS v4, in the style of the Zwap site — designed in Figma, shipped by directing Claude through the build.
 
