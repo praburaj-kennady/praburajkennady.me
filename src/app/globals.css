@@ -153,10 +153,11 @@
     position: relative;
     margin: 0;
   }
+  /* The field stops short of the left and right edges of the window. */
   .holding-squares {
     position: absolute;
-    inset: 0;
-    width: 100%;
+    inset: 0 clamp(20px, 8vw, 128px);
+    width: calc(100% - 2 * clamp(20px, 8vw, 128px));
     height: 100%;
     pointer-events: none;
     /* Fade the field out towards the left and right edges: clear at the
