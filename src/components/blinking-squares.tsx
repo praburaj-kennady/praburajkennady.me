@@ -15,6 +15,9 @@ export interface BlinkingSquaresProps {
   direction?: Direction;
   /** Cells along the long side of the canvas (8–200). */
   gridSize?: number;
+  /** Cell size in CSS pixels. When set, it overrides gridSize, so the
+      squares stay the same size at any window width. */
+  cellSize?: number;
   /** Share of each cell a square fills (0.05–0.98). */
   squareSize?: number;
   /** Where squares begin to appear, measured towards `direction` (0–1). */
@@ -50,6 +53,7 @@ function hash(x: number, y: number, k: number) {
 export function BlinkingSquares({
   direction = "right",
   gridSize = 52,
+  cellSize,
   squareSize = 0.57,
   fadeStart = 0.65,
   fadeEnd = 1,
@@ -94,7 +98,9 @@ export function BlinkingSquares({
       canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-      cell = Math.max(width, height) / clamp(gridSize, 8, 200);
+      cell = cellSize
+        ? Math.max(cellSize, 2)
+        : Math.max(width, height) / clamp(gridSize, 8, 200);
       size = cell * clamp(squareSize, 0.05, 0.98);
       inset = (cell - size) / 2;
       const cols = Math.ceil(width / cell);
@@ -177,7 +183,7 @@ export function BlinkingSquares({
       darkScheme.removeEventListener("change", restyle);
       reduceMotion.removeEventListener("change", start);
     };
-  }, [direction, gridSize, squareSize, fadeStart, fadeEnd, falloff, minBrightness, twinkleSpeed, twinkleStrength, opacity, dpr]);
+  }, [direction, gridSize, cellSize, squareSize, fadeStart, fadeEnd, falloff, minBrightness, twinkleSpeed, twinkleStrength, opacity, dpr]);
 
   return <canvas ref={canvasRef} aria-hidden="true" className={className} />;
 }
