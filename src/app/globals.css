@@ -152,6 +152,7 @@
   .holding h1 {
     position: relative;
     margin: 0;
+    animation: fade-in 800ms cubic-bezier(0.23, 1, 0.32, 1) 100ms both;
   }
   /* The field stops short of the left and right edges of the window. */
   .holding-squares {
@@ -169,5 +170,13 @@
       #000 65%,
       transparent 96%
     );
+  }
+}
+
+/* The message fades in once, when the page is first shown. Opacity only,
+   so it also plays under Reduce Motion. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
 }

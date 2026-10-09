@@ -6,7 +6,8 @@ import { useEffect, useRef } from "react";
    edge (`direction`) and thins out to nothing towards the other, so it can
    sit behind content without crowding it. Drawn on a 2D canvas; the
    squares take the page's --text colour, so they follow light and dark.
-   Under Reduce Motion it draws one still frame. */
+   On first draw the squares fade in one by one. Under Reduce Motion it
+   draws one still frame, with no fade. */
 
 type Direction = "right" | "left" | "top" | "bottom";
 
@@ -35,6 +36,11 @@ export interface BlinkingSquaresProps {
   twinkleStrength?: number;
   /** Overall alpha of the field (0–1). */
   opacity?: number;
+  /** Seconds over which the squares first fade in, each at its own
+      moment (0 shows them at once). */
+  fadeIn?: number;
+  /** Seconds to wait before the first squares start to fade in. */
+  fadeInDelay?: number;
   /** Highest device pixel ratio to draw at (1–3). */
   dpr?: number;
   className?: string;
@@ -63,6 +69,8 @@ export function BlinkingSquares({
   twinkleSpeed = 1.4,
   twinkleStrength = 0.94,
   opacity = 1,
+  fadeIn = 2,
+  fadeInDelay = 0,
   dpr = 1.5,
   className,
 }: BlinkingSquaresProps) {
@@ -82,9 +90,13 @@ export function BlinkingSquares({
     let cell = 0;
     let inset = 0;
     let size = 0;
-    // Per lit square: x, y, resting brightness, phase, speed.
+    // Per lit square: x, y, resting brightness, phase, speed, appear time.
     let squares = new Float32Array(0);
     let frame = 0;
+    // The fade-in plays once, from when the field is first mounted.
+    const born = performance.now();
+    // Each square takes this long to fade in once its moment comes.
+    const appearFor = Math.min(0.8, fadeIn);
 
     const readColor = () => {
       color = getComputedStyle(canvas).getPropertyValue("--text").trim() || "#111";
@@ -127,21 +139,31 @@ export function BlinkingSquares({
             rest,
             hash(i, j, 3) * Math.PI * 2,
             0.8 + hash(i, j, 4) * 0.4,
+            fadeInDelay + hash(i, j, 5) * Math.max(fadeIn - appearFor, 0),
           );
         }
       }
       squares = new Float32Array(lit);
     };
 
-    const draw = (time: number) => {
+    /* Draws the field at `time` (ms, on the requestAnimationFrame clock).
+       A still frame skips the fade-in. */
+    const draw = (time: number, still = false) => {
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = color;
       const seconds = time / 1000;
+      const age = (time - born) / 1000;
       const strength = clamp(twinkleStrength, 0, 1);
-      for (let n = 0; n < squares.length; n += 5) {
+      for (let n = 0; n < squares.length; n += 6) {
+        let appear = 1;
+        if (!still && appearFor > 0) {
+          const p = clamp((age - squares[n + 5]) / appearFor, 0, 1);
+          if (p === 0) continue;
+          appear = p * p * (3 - 2 * p); // ease in and out
+        }
         const wave = 0.5 + 0.5 * Math.sin(seconds * twinkleSpeed * squares[n + 4] + squares[n + 3]);
         const brightness = squares[n + 2] * (1 - strength * wave);
-        ctx.globalAlpha = clamp(brightness * opacity, 0, 1);
+        ctx.globalAlpha = clamp(brightness * opacity * appear, 0, 1);
         ctx.fillRect(squares[n], squares[n + 1], size, size);
       }
       ctx.globalAlpha = 1;
@@ -154,13 +176,13 @@ export function BlinkingSquares({
 
     const start = () => {
       cancelAnimationFrame(frame);
-      if (reduceMotion.matches || twinkleSpeed === 0) draw(0);
+      if (reduceMotion.matches) draw(0, true);
       else frame = requestAnimationFrame(loop);
     };
 
     const restyle = () => {
       readColor();
-      if (reduceMotion.matches) draw(0);
+      if (reduceMotion.matches) draw(0, true);
     };
 
     readColor();
@@ -169,7 +191,7 @@ export function BlinkingSquares({
 
     const resize = new ResizeObserver(() => {
       layout();
-      if (reduceMotion.matches) draw(0);
+      if (reduceMotion.matches) draw(0, true);
     });
     resize.observe(canvas);
     const theme = new MutationObserver(restyle);
@@ -184,7 +206,7 @@ export function BlinkingSquares({
       darkScheme.removeEventListener("change", restyle);
       reduceMotion.removeEventListener("change", start);
     };
-  }, [direction, gridSize, cellSize, squareSize, fadeStart, fadeEnd, falloff, minBrightness, twinkleSpeed, twinkleStrength, opacity, dpr]);
+  }, [direction, gridSize, cellSize, squareSize, fadeStart, fadeEnd, falloff, minBrightness, twinkleSpeed, twinkleStrength, opacity, fadeIn, fadeInDelay, dpr]);
 
   return <canvas ref={canvasRef} aria-hidden="true" className={className} />;
 }
