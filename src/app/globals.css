@@ -152,7 +152,12 @@
   .holding h1 {
     position: relative;
     margin: 0;
-    animation: fade-in 800ms cubic-bezier(0.23, 1, 0.32, 1) 100ms both;
+    animation: settle-in 1100ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .holding h1 {
+      animation: fade-in 800ms ease-out 100ms both;
+    }
   }
   /* The field stops short of the left and right edges of the window. */
   .holding-squares {
@@ -173,8 +178,16 @@
   }
 }
 
-/* The message fades in once, when the page is first shown. Opacity only,
-   so it also plays under Reduce Motion. */
+/* The message settles in once, when the page is first shown: it rises a
+   few pixels and comes into focus as it fades in. Under Reduce Motion it
+   only fades. */
+@keyframes settle-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(6px);
+  }
+}
 @keyframes fade-in {
   from {
     opacity: 0;

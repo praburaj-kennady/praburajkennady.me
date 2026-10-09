@@ -6,8 +6,9 @@ import { useEffect, useRef } from "react";
    edge (`direction`) and thins out to nothing towards the other, so it can
    sit behind content without crowding it. Drawn on a 2D canvas; the
    squares take the page's --text colour, so they follow light and dark.
-   On first draw the squares fade in one by one. Under Reduce Motion it
-   draws one still frame, with no fade. */
+   On first draw the field builds up from its anchored edge: each square
+   grows and fades in at its own moment, nearer squares first. Under
+   Reduce Motion it draws one still frame, with no build. */
 
 type Direction = "right" | "left" | "top" | "bottom";
 
@@ -133,13 +134,19 @@ export function BlinkingSquares({
           const density = Math.pow(clamp((t - start) / span, 0, 1), falloff);
           if (hash(i, j, 1) >= density) continue;
           const rest = minBrightness + hash(i, j, 2) * (1 - minBrightness);
+          // Squares nearest the anchored edge appear first, with a little
+          // randomness so the front of the build isn't a hard line.
+          const order = clamp((1 - t) / Math.max(1 - start, 1e-3), 0, 1);
+          const appearAt =
+            fadeInDelay +
+            (0.75 * order + 0.25 * hash(i, j, 5)) * Math.max(fadeIn - appearFor, 0);
           lit.push(
             i * cell + inset,
             j * cell + inset,
             rest,
             hash(i, j, 3) * Math.PI * 2,
             0.8 + hash(i, j, 4) * 0.4,
-            fadeInDelay + hash(i, j, 5) * Math.max(fadeIn - appearFor, 0),
+            appearAt,
           );
         }
       }
@@ -156,15 +163,19 @@ export function BlinkingSquares({
       const strength = clamp(twinkleStrength, 0, 1);
       for (let n = 0; n < squares.length; n += 6) {
         let appear = 1;
+        let scale = 1;
         if (!still && appearFor > 0) {
           const p = clamp((age - squares[n + 5]) / appearFor, 0, 1);
           if (p === 0) continue;
           appear = p * p * (3 - 2 * p); // ease in and out
+          scale = 0.2 + 0.8 * (1 - Math.pow(1 - p, 3)); // grows, easing out
         }
         const wave = 0.5 + 0.5 * Math.sin(seconds * twinkleSpeed * squares[n + 4] + squares[n + 3]);
         const brightness = squares[n + 2] * (1 - strength * wave);
         ctx.globalAlpha = clamp(brightness * opacity * appear, 0, 1);
-        ctx.fillRect(squares[n], squares[n + 1], size, size);
+        const s = size * scale;
+        const offset = (size - s) / 2;
+        ctx.fillRect(squares[n] + offset, squares[n + 1] + offset, s, s);
       }
       ctx.globalAlpha = 1;
     };

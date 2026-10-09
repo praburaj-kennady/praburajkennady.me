@@ -2,8 +2,8 @@ import { BlinkingSquares } from "@/components/blinking-squares";
 
 /* A holding page while the site is being built. The squares rise from the
    foot of the window and thin out well before the message, so it always
-   reads on the plain page colour. On arrival the message fades in first,
-   then the squares appear one by one. */
+   reads on the plain page colour. On arrival the message settles in first,
+   then the squares build up from the bottom. */
 export default function Home() {
   return (
     <main className="holding">
