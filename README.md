@@ -8,7 +8,7 @@ Built with [Next.js](https://nextjs.org) and Tailwind CSS v4, in the style of th
 
 - **Framework** — Next.js (App Router, TypeScript)
 - **Styling** — Tailwind v4; design tokens in `src/app/globals.css` (day and night colours that follow the system, with `data-theme` to override)
-- **Type** — Nunito (500, 700, 800, 900), via `next/font`
+- **Type** — Nunito (500, 700, 800, 900): the Zwap site's static font files, self-hosted via `next/font/local` from `src/app/fonts/`, under the SIL Open Font License
 - **Motion** — the Zwap site's page transitions, through React's `<ViewTransition>`: a zoom to and from home, a drift between Work and Experience, a crossfade alone under Reduce Motion (`src/components/page-link.tsx`, `page-transition.tsx`)
 
 ## Develop

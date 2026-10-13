@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
+import localFont from "next/font/local";
 import { ArrivalFocus } from "@/components/arrival-focus";
 import { profile } from "@/content/site";
 import "./globals.css";
 
-/* Nunito in the four weights the style uses. next/font serves the files
-   from this site, so no request goes to Google. */
-const nunito = Nunito({
-  subsets: ["latin"],
-  weight: ["500", "700", "800", "900"],
+/* Nunito in the four weights the style uses: the same static files the
+   Zwap site serves (fonts/, under the SIL Open Font License in OFL.txt),
+   so the text draws at the same weight. */
+const nunito = localFont({
+  src: [
+    { path: "./fonts/Nunito-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Nunito-Bold.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/Nunito-ExtraBold.woff2", weight: "800", style: "normal" },
+    { path: "./fonts/Nunito-Black.woff2", weight: "900", style: "normal" },
+  ],
   variable: "--font-nunito",
   display: "swap",
 });
@@ -32,7 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${nunito.variable} antialiased`}>
+    <html lang="en" className={nunito.variable}>
       <body>
         {children}
         <ArrivalFocus />
