@@ -7,7 +7,10 @@
 
 export const profile = {
   name: "praburaj kennady",
-  tagline: "Product designer shipping designs into products with AI.",
+  /** The home page's heading, for screen readers; it is not shown. */
+  fullName: "Praburaj Kennady",
+  tagline:
+    "Praburaj Kennady, product builder shipping initiative ideas into usable products with AI.",
   taglineDetail:
     "Currently working at Zoho with 6 years of experience across enterprise and consumer products, on iOS, Android, and TV.",
   email: "praburajkennady.design@gmail.com",
