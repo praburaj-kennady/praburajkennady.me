@@ -18,8 +18,16 @@ export const metadata: Metadata = {
     "Product designer shipping designs into products with AI. Five years across consumer and enterprise, on Android, iOS, and TV.",
 };
 
+/* On phones: the browser's own toolbars take the page colour (the --base
+   token, day and night), and the page may draw under the notch and the
+   home indicator, with globals.css keeping the content clear of them. */
 export const viewport: Viewport = {
   colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
