@@ -30,12 +30,21 @@ export const pages = {
 
 /** The footer's credit: "<site>, designed by <name>." with the name
     linking home. */
-export const footer = {
-  site: "praburajkennady.me",
-  designedBy: "designed by",
+/** The home page's pills, in order. "More about me" goes to Experience. */
+export const homeLinks = {
+  work: "Work",
+  about: "More about me",
+  resume: "Resume",
 };
 
-/** Flip to true once public/resume/resume.pdf exists. */
+/** Profiles linked from the footer. */
+export const socials = [
+  { name: "X", href: "https://x.com/praburajkennady" },
+  { name: "LinkedIn", href: "https://www.linkedin.com/in/praburajkennady/" },
+] as const;
+
+/** Flip to true once public/resume/resume.pdf exists: the Resume pill
+    then links to it. */
 export const resumeAvailable = false;
 
 export type Tag =

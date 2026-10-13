@@ -262,15 +262,17 @@
     text-align: center;
     padding: 28px 0;
   }
-  /* The planet over the first line: 240px square, 200px on a phone. */
-  .hero-orb {
+  /* The portrait over the first line, 40px above it: 240px square,
+     200px on a phone, in the --inverse colour. */
+  .hero-art {
     display: block;
     width: 240px;
     height: 240px;
-    margin: 0 auto 16px;
+    margin: 0 auto 40px;
+    color: var(--inverse);
   }
   @media (max-width: 480px) {
-    .hero-orb {
+    .hero-art {
       width: 200px;
       height: 200px;
     }
@@ -299,7 +301,11 @@
     flex-wrap: wrap;
     margin: 32px 0 0;
   }
-  .links a {
+  .links a,
+  .links button {
+    font: inherit;
+    border: 0;
+    cursor: pointer;
     background: var(--raised);
     color: var(--text);
     font-size: 1.125rem; /* 18px, Title 2 */
@@ -313,58 +319,60 @@
       transform 160ms var(--ease-out);
   }
   @media (hover: hover) and (pointer: fine) {
-    .links a:hover {
+    .links a:hover,
+    .links button:hover {
       background: var(--line);
     }
   }
-  .links a:active {
+  .links a:active,
+  .links button:active {
     transform: scale(0.97);
   }
   @media (prefers-reduced-motion: reduce) {
-    .links a:active {
+    .links a:active,
+    .links button:active {
       transform: none;
     }
   }
 
-  /* The footer's lines stand on the left, and a link to another page on
-     the right of the first line, as the header sets the name and the nav.
-     On a phone there is no room beside it, and the lines stack. */
+  /* The footer: the email on the left, the profiles on the right, as the
+     header sets the name and the nav. */
   .site-footer {
     margin-top: 56px;
     padding-top: 20px;
     border-top: 1px solid var(--line);
-    color: var(--muted);
     font-size: 0.9375rem; /* 15px, Callout */
     line-height: 1.25rem;
     font-weight: 600;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    column-gap: 16px;
-    row-gap: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
   }
   .site-footer p {
-    color: var(--muted);
     margin: 0;
-    grid-column: 1;
-  }
-  .site-footer .footer-pages {
-    grid-column: 2;
-    grid-row: 1;
   }
   .site-footer a {
     color: var(--text-2);
+  }
+  .socials {
+    display: flex;
+    gap: 24px;
+  }
+  .socials a {
+    display: block;
+    color: var(--inverse);
+    border-radius: 2px;
+  }
+  .socials svg {
+    display: block;
+    width: 20px;
+    height: 20px;
   }
 
   @media (max-width: 480px) {
     .site-nav {
       gap: 16px;
-    }
-    .site-footer {
-      grid-template-columns: 1fr;
-    }
-    .site-footer .footer-pages {
-      grid-column: 1;
-      grid-row: auto;
     }
   }
   /* Kept on one line, until the window is too narrow for it and the nav. */
