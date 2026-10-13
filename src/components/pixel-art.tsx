@@ -8,7 +8,7 @@ import type { SVGProps } from "react";
 type IconProps = SVGProps<SVGSVGElement>;
 
 /** A figure in headphones, the home page's picture. At rest he is the
-    plain drawing. Under the pointer he listens to a slow, soulful song:
+    plain drawing. While data-listening is set (HeroPortrait) he listens to a slow song:
     his eyes close (open, half, shut) and stay closed, notes drift up past
     his ear and fade, a heart beats beside him, and sparkles blink. The
     notes, heart and sparkles are from the same Figma frame; they sit
@@ -41,22 +41,23 @@ export function PixelPortrait(props: IconProps) {
       <path d="M5.73749 97.1625H17.1375V142.838H5.73749V97.1625Z" />
 
       {/* The eyes, in three frames: open, two pixels tall; half shut, the
-          lower pixel; shut, a line two pixels wide. */}
+          upper pixel; shut, a line two pixels wide at the lid, running in
+          towards the nose. */}
       <g className="eyes-open">
         <path d="M120.037 119.962H131.437V142.837H120.037V119.962Z" />
         <path d="M177.112 119.962H188.587V142.837H177.112V119.962Z" />
       </g>
       <g className="eyes-half">
-        <path d="M120.037 131.4H131.437V142.837H120.037V131.4Z" />
-        <path d="M177.112 131.4H188.587V142.837H177.112V131.4Z" />
+        <path d="M120.037 119.962H131.437V131.4H120.037V119.962Z" />
+        <path d="M177.112 119.962H188.587V131.4H177.112V119.962Z" />
       </g>
       <g className="eyes-shut">
-        <path d="M108.6 131.4H131.437V142.837H108.6V131.4Z" />
-        <path d="M165.712 131.4H188.587V142.837H165.712V131.4Z" />
+        <path d="M120.037 119.962H142.837V131.4H120.037V119.962Z" />
+        <path d="M165.712 119.962H188.587V131.4H165.712V119.962Z" />
       </g>
 
       {/* Two notes over his right ear and a third beside it; shown under the pointer. */}
-      <g className="deco" transform="translate(168 -83.5)">
+      <g className="deco deco-note-a" transform="translate(168 -83.5)">
         <g className="note note-a">
           <path d="M29.8027 0H37.2594V3.70722H29.8027V0Z" />
           <path d="M29.8026 22.1706V25.8536H26.0864V33.2438H29.8026V36.9268H37.2594V33.2438H41V3.70721H37.2594V22.1706H29.8026Z" />
@@ -65,14 +66,14 @@ export function PixelPortrait(props: IconProps) {
           <path d="M3.74061 48H11.1974V44.317H14.9135V11.0732H11.1974V33.2438H3.74061V36.9268H0V44.317H3.74061V48Z" />
         </g>
       </g>
-      <g className="deco" transform="translate(239 -69.5)">
+      <g className="deco deco-note-b" transform="translate(239 -69.5)">
         <g className="note note-b">
           <path d="M21.4352 10.9069H25V18.1861H21.4352V10.9069Z" />
           <path d="M17.8706 7.27924H21.4353V10.9069H17.8706V7.27924Z" />
           <path d="M14.2824 3.62769V0H10.7177V25.4654H3.56474V29.0931H0V36.3723H3.56474V40H10.7177V36.3723H14.2824V7.27924H17.8706V3.62769H14.2824Z" />
         </g>
       </g>
-      <g className="deco" transform="translate(204 -19.5)">
+      <g className="deco deco-note-c" transform="translate(204 -19.5)">
         <g className="note note-c">
           <path d="M17.1482 8.72552H20V14.5489H17.1482V8.72552Z" />
           <path d="M14.2965 5.82339H17.1483V8.72554H14.2965V5.82339Z" />
@@ -81,7 +82,7 @@ export function PixelPortrait(props: IconProps) {
       </g>
 
       {/* A heart and two sparkles on his left. */}
-      <g className="deco" transform="translate(10 -29.5)">
+      <g className="deco deco-heart" transform="translate(10 -29.5)">
         <g className="heart">
           <path d="M31.7292 5.35081H37V15.9825H31.7292V5.35081Z" />
           <path d="M26.4235 15.9825H31.729V21.3334H26.4235V15.9825Z" />
@@ -95,17 +96,21 @@ export function PixelPortrait(props: IconProps) {
           <path d="M0 5.35081H5.30552V15.9825H0V5.35081Z" />
         </g>
       </g>
-      <g className="deco blink blink-a" transform="translate(-56 -37.5)">
-        <path d="M13.3479 6.6521H20V13.3479H13.3479V6.6521Z" />
-        <path d="M6.69598 13.3479H13.3481V20H6.69598V13.3479Z" />
-        <path d="M6.69598 0H13.3481V6.65207H6.69598V0Z" />
-        <path d="M0 6.6521H6.69587V13.3479H0V6.6521Z" />
+      <g className="deco deco-sparkle-a" transform="translate(-56 -37.5)">
+        <g className="blink blink-a">
+          <path d="M13.3479 6.6521H20V13.3479H13.3479V6.6521Z" />
+          <path d="M6.69598 13.3479H13.3481V20H6.69598V13.3479Z" />
+          <path d="M6.69598 0H13.3481V6.65207H6.69598V0Z" />
+          <path d="M0 6.6521H6.69587V13.3479H0V6.6521Z" />
+        </g>
       </g>
-      <g className="deco blink blink-b" transform="translate(-29 26.5)">
-        <path d="M15.0082 4.99176H20V15.0082H15.0082V4.99176Z" />
-        <path d="M4.99164 15.0082H15.008V20H4.99164V15.0082Z" />
-        <path d="M4.99164 0H15.008V4.99179H4.99164V0Z" />
-        <path d="M0 4.99176H4.99179V15.0082H0V4.99176Z" />
+      <g className="deco deco-sparkle-b" transform="translate(-29 26.5)">
+        <g className="blink blink-b">
+          <path d="M15.0082 4.99176H20V15.0082H15.0082V4.99176Z" />
+          <path d="M4.99164 15.0082H15.008V20H4.99164V15.0082Z" />
+          <path d="M4.99164 0H15.008V4.99179H4.99164V0Z" />
+          <path d="M0 4.99176H4.99179V15.0082H0V4.99176Z" />
+        </g>
       </g>
     </svg>
   );

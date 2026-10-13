@@ -1,6 +1,6 @@
 import { PageLink } from "@/components/page-link";
 import { PageTransition } from "@/components/page-transition";
-import { PixelPortrait } from "@/components/pixel-art";
+import { HeroPortrait } from "@/components/hero-portrait";
 import { SiteFooter } from "@/components/site-footer";
 import { homeLinks, profile, resumeAvailable } from "@/content/site";
 
@@ -17,7 +17,7 @@ export default function Home() {
         <main>
           <section className="hero">
             <h1 className="sr-only">{profile.fullName}</h1>
-            <PixelPortrait className="hero-art" />
+            <HeroPortrait className="hero-art" />
             <p className="lede">{profile.tagline}</p>
             <p>{profile.taglineDetail}</p>
             <nav className="links" aria-label="Pages">
