@@ -39,10 +39,18 @@ const nothing = (reason: string) =>
     headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
   });
 
+/* Film songs credit many singers; the line under the portrait has room
+   for two names, and says how many more there are. */
+const credit = (artists: { name: string }[]) => {
+  const names = artists.map((a) => a.name);
+  if (names.length <= 2) return names.join(" & ");
+  return `${names[0]}, ${names[1]} & ${names.length - 2} more`;
+};
+
 const shape = (t: Track, playing: boolean): NowPlaying => ({
   track: {
     title: t.name,
-    artist: t.artists.map((a) => a.name).join(", "),
+    artist: credit(t.artists),
     url: t.external_urls.spotify,
     playing,
   },
