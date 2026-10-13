@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 /* What I'm listening to on Spotify, for the home page's portrait. Reads
    the track playing now, or the last one played when nothing is. Needs
-   three secrets (see README › Now playing): SPOTIFY_CLIENT_ID,
+   three secrets (set up once through /api/spotify/connect; README › Now playing): SPOTIFY_CLIENT_ID,
    SPOTIFY_CLIENT_SECRET and SPOTIFY_REFRESH_TOKEN. Without them, or if
    Spotify is down, it answers { track: null } rather than failing. The
    answer is cached at the edge for 30s, so a burst of visitors is one
