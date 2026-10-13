@@ -279,45 +279,54 @@
     }
   }
 
-  /* The portrait listens to music, animated as pixel art is: every change
-     is a cut from one frame to the next (step-end), never a tween.
-     - Eyes: open, then half shut, then shut for most of the loop, and
-       back the same way. One loop is 6s.
-     - Notes and heart: two frames, resting and one step up, swapped on
-       the beat; the notes keep different time so they don't hop as one.
-     - Sparkles: on, then off for a beat. */
+  /* At rest the portrait is the plain drawing: eyes open, nothing around
+     him. Under the pointer he listens to a slow song, animated as pixel
+     art is: every change is a cut to the next frame (step-end), never a
+     tween, and the song is unhurried.
+     - Eyes: open, half shut, shut, in under a second, then they stay shut
+       while the pointer stays.
+     - Notes: each rises past his ear a pixel step at a time and fades,
+       on its own beat, so there is always one in the air.
+     - Heart: a slow beat, one step up and back.
+     - Sparkles: a slow blink, out of step with each other.
+     Under Reduce Motion the pointer only shows the notes and the heart,
+     still, with his eyes open. On a touch screen a tap does what the
+     pointer does. */
+  .hero-art .deco,
   .hero-art .eyes-half,
   .hero-art .eyes-shut {
     opacity: 0;
   }
+  .hero-art:hover .deco {
+    opacity: 1;
+  }
   @media (prefers-reduced-motion: no-preference) {
-    .hero-art .eyes-open {
-      animation: eyes-open 6s step-end infinite;
+    .hero-art:hover .eyes-open {
+      animation: eyes-open 1s step-end forwards;
     }
-    .hero-art .eyes-half {
-      animation: eyes-half 6s step-end infinite;
+    .hero-art:hover .eyes-half {
+      animation: eyes-half 1s step-end forwards;
     }
-    .hero-art .eyes-shut {
-      animation: eyes-shut 6s step-end infinite;
+    .hero-art:hover .eyes-shut {
+      animation: eyes-shut 1s step-end forwards;
     }
-    .hero-art .hop {
-      animation: hop 1.2s step-end infinite;
+    .hero-art:hover .note {
+      animation: note-rise 3.6s step-end infinite;
     }
-    .hero-art .hop-b {
-      animation-delay: -0.6s;
+    .hero-art:hover .note-b {
+      animation-delay: -1.2s;
     }
-    .hero-art .hop-c {
-      animation-duration: 0.8s;
+    .hero-art:hover .note-c {
+      animation-delay: -2.4s;
     }
-    .hero-art .hop-heart {
-      animation-duration: 1.6s;
-      animation-delay: -0.4s;
+    .hero-art:hover .heart {
+      animation: heart-beat 2.4s step-end infinite;
     }
-    .hero-art .blink {
-      animation: blink 1.6s step-end infinite;
+    .hero-art:hover .blink {
+      animation: blink 2.4s step-end infinite;
     }
-    .hero-art .blink-b {
-      animation-delay: -0.8s;
+    .hero-art:hover .blink-b {
+      animation-delay: -1.2s;
     }
   }
   /* The first line, set in Title 1; the line under it in Reading. */
@@ -569,26 +578,32 @@
 /* The portrait's frames (see .hero-art). */
 @keyframes eyes-open {
   0% { opacity: 1; }
-  40% { opacity: 0; }
-  93% { opacity: 1; }
+  40%, 100% { opacity: 0; }
 }
 @keyframes eyes-half {
   0% { opacity: 0; }
   40% { opacity: 1; }
-  43% { opacity: 0; }
-  90% { opacity: 1; }
-  93% { opacity: 0; }
+  70%, 100% { opacity: 0; }
 }
 @keyframes eyes-shut {
   0% { opacity: 0; }
-  43% { opacity: 1; }
-  90% { opacity: 0; }
+  70%, 100% { opacity: 1; }
 }
-@keyframes hop {
-  0% { transform: translateY(0); }
+/* A note rises four pixel steps and fades. */
+@keyframes note-rise {
+  0% { opacity: 0; transform: translateY(8px); }
+  5% { opacity: 1; transform: translateY(8px); }
+  25% { transform: translateY(4px); }
+  45% { transform: translateY(0); }
+  65% { transform: translateY(-4px); }
+  80% { opacity: 1; transform: translateY(-8px); }
+  82%, 100% { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes heart-beat {
+  0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
 @keyframes blink {
-  0% { opacity: 1; }
-  75% { opacity: 0; }
+  0%, 100% { opacity: 1; }
+  60% { opacity: 0; }
 }
