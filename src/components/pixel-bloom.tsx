@@ -14,7 +14,8 @@ import { PORTRAIT_PATHS } from "@/components/pixel-art";
    pointer moves on. On a touch screen a finger does the same. When the page
    is first shown the squares gather from a loose scatter into the figure.
    Under Reduce Motion the figure is drawn still. With nothing moving, it
-   stops drawing. The colours are the same in light and dark. */
+   stops drawing. On a light page the colours are deeper, so they hold up
+   on white; on a dark one they are the poster's own. */
 
 const ART = 240; // the drawing's own size
 const PIXELS = 21; // its pixels a side
@@ -22,16 +23,17 @@ const SPLIT = 2; // squares per pixel, a side
 const GAP = 0.2; // space between squares, as a share of a square's cell
 const STRIDE = 9; // numbers kept per square
 
-/* The poster's colours, in the order the patches run, each with its share
-   of the squares. */
-const PALETTE: [string, number][] = [
-  ["#F0B050", 0.22], // amber
-  ["#F0B070", 0.3], // peach
-  ["#F09070", 0.14], // salmon
-  ["#F05070", 0.1], // coral
-  ["#F05090", 0.12], // pink
-  ["#7070F0", 0.07], // periwinkle
-  ["#5030B0", 0.05], // violet
+/* The poster's colours, in the order the patches run: each with its share
+   of the squares, its deeper shade for a light page, and its own for a
+   dark one. */
+const PALETTE: [share: number, light: string, dark: string][] = [
+  [0.22, "#D4821C", "#F0B050"], // amber
+  [0.3, "#DC8648", "#F0B070"], // peach
+  [0.14, "#D9653F", "#F09070"], // salmon
+  [0.1, "#D93356", "#F05070"], // coral
+  [0.12, "#CF3175", "#F05090"], // pink
+  [0.07, "#4F4FDB", "#7070F0"], // periwinkle
+  [0.05, "#3F2196", "#5030B0"], // violet
 ];
 
 /* A small seeded random, so the patches fall the same way on every visit. */
@@ -57,6 +59,7 @@ export function PixelBloom({ className }: { className?: string }) {
     if (!canvas || !ctx) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
 
     // Which squares the drawing covers, read once from its paths.
     const grid = PIXELS * SPLIT;
@@ -96,13 +99,19 @@ export function PixelBloom({ className }: { className?: string }) {
       n,
       v: field(cells[n * 2] / grid, cells[n * 2 + 1] / grid) + (random() - 0.5) * 0.12,
     })).sort((a, b) => a.v - b.v);
-    const color = new Array<string>(count);
+    const tone = new Uint8Array(count);
     let from = 0;
-    PALETTE.forEach(([hex, share], index) => {
+    PALETTE.forEach(([share], index) => {
       const to = index === PALETTE.length - 1 ? count : from + Math.round(share * count);
-      for (let r = from; r < to; r++) color[order[r].n] = hex;
+      for (let r = from; r < to; r++) tone[order[r].n] = index;
       from = to;
     });
+    // The shades for the page as it is now, light or dark.
+    let shades = PALETTE.map(([, light]) => light);
+    const readScheme = () => {
+      const dark = getComputedStyle(document.documentElement).colorScheme === "dark";
+      shades = PALETTE.map(([, light, deep]) => (dark ? deep : light));
+    };
 
     /* Per square: home x, home y, x, y, velocity x, velocity y, shade, how
        hard the pointer throws it, and how far off the straight line. */
@@ -154,7 +163,7 @@ export function PixelBloom({ className }: { className?: string }) {
       for (let n = 0; n < count; n++) {
         const o = n * STRIDE;
         ctx.globalAlpha = sq[o + 6];
-        ctx.fillStyle = color[n];
+        ctx.fillStyle = shades[tone[n]];
         ctx.fillRect(sq[o + 2] - s / 2, sq[o + 3] - s / 2, s, s);
       }
       ctx.globalAlpha = 1;
@@ -244,6 +253,12 @@ export function PixelBloom({ className }: { className?: string }) {
       pointer.active = false;
     };
 
+    const restyle = () => {
+      readScheme();
+      if (!running) draw();
+    };
+
+    readScheme();
     if (reduceMotion.matches) {
       still();
     } else {
@@ -261,6 +276,9 @@ export function PixelBloom({ className }: { className?: string }) {
       draw();
     });
     resize.observe(canvas);
+    const theme = new MutationObserver(restyle);
+    theme.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    darkScheme.addEventListener("change", restyle);
     reduceMotion.addEventListener("change", still);
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onMove, { passive: true });
@@ -275,6 +293,8 @@ export function PixelBloom({ className }: { className?: string }) {
     return () => {
       cancelAnimationFrame(frame);
       resize.disconnect();
+      theme.disconnect();
+      darkScheme.removeEventListener("change", restyle);
       reduceMotion.removeEventListener("change", still);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onMove);

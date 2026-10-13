@@ -263,7 +263,7 @@
     padding: 28px 0;
   }
   /* The portrait over the first line, 40px above it: 240px square,
-     200px on a phone, in the poster's colours. */
+     200px on a phone, in the poster's colours (deeper on a light page). */
   .hero-art {
     display: block;
     width: 240px;
