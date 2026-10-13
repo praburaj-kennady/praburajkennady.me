@@ -238,24 +238,28 @@
     margin-bottom: 0;
   }
 
-  /* The home page fills the window. Its hero stands midway between the
-     top of the window and the footer's rule, and the footer at the
-     window's foot. In a window too short for both, the page scrolls. */
+  /* The home page fills the window. Its hero stands in the middle of the
+     window, and the footer at the window's foot: three rows, the outer two
+     shared equally, so the hero stays centred while there is room. In a
+     window too short for that, the footer's row takes what it needs, the
+     hero rises, and the page scrolls; they never overlap. The page's
+     padding is even top and bottom here, so nothing nudges the centre. */
   .home {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 1fr auto 1fr;
     min-height: 100vh;
     min-height: 100svh;
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
   }
-  .home main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  .home::before {
+    content: "";
+  }
+  .home .site-footer {
+    align-self: end;
   }
   .hero {
     text-align: center;
-    padding: 56px 0 28px;
+    padding: 28px 0;
   }
   .hero h1 {
     margin: 0 0 12px;
