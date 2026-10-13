@@ -11,6 +11,9 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export interface NowPlaying {
+  /** Why there is no track, when there isn't: which step came up empty.
+      Never a secret; there for a look at /api/now-playing by hand. */
+  reason?: string;
   /** The track, or null when nothing is known. */
   track: {
     title: string;
@@ -31,8 +34,8 @@ interface Track {
   external_urls: { spotify: string };
 }
 
-const nothing = () =>
-  NextResponse.json({ track: null } satisfies NowPlaying, {
+const nothing = (reason: string) =>
+  NextResponse.json({ track: null, reason } satisfies NowPlaying, {
     headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
   });
 
@@ -49,7 +52,9 @@ export async function GET() {
   const id = process.env.SPOTIFY_CLIENT_ID;
   const secret = process.env.SPOTIFY_CLIENT_SECRET;
   const refresh = process.env.SPOTIFY_REFRESH_TOKEN;
-  if (!id || !secret || !refresh) return nothing();
+  if (!id || !secret || !refresh) {
+    return nothing(`missing: ${[!id && "client id", !secret && "client secret", !refresh && "refresh token"].filter(Boolean).join(", ")}`);
+  }
 
   try {
     const auth = await fetch(TOKEN, {
@@ -61,28 +66,33 @@ export async function GET() {
       body: new URLSearchParams({ grant_type: "refresh_token", refresh_token: refresh }),
       cache: "no-store",
     });
-    if (!auth.ok) return nothing();
+    if (!auth.ok) return nothing(`token refresh failed: ${auth.status}`);
     const { access_token } = (await auth.json()) as { access_token: string };
     const headers = { Authorization: `Bearer ${access_token}` };
 
     let body: NowPlaying = { track: null };
     const now = await fetch(PLAYING, { headers, cache: "no-store" });
     // 204: nothing playing. Podcasts have no track item.
+    let reason = `now playing: ${now.status}`;
     if (now.status === 200) {
       const data = (await now.json()) as { is_playing: boolean; item: Track | null; currently_playing_type: string };
       if (data.item && data.currently_playing_type === "track") body = shape(data.item, data.is_playing);
+      else reason = `now playing: ${data.currently_playing_type}`;
     }
     if (!body.track) {
       const last = await fetch(RECENT, { headers, cache: "no-store" });
       if (last.ok) {
         const data = (await last.json()) as { items: { track: Track }[] };
         if (data.items[0]) body = shape(data.items[0].track, false);
+        else body.reason = `${reason}; recently played: empty`;
+      } else {
+        body.reason = `${reason}; recently played: ${last.status}`;
       }
     }
     return NextResponse.json(body, {
       headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
     });
-  } catch {
-    return nothing();
+  } catch (e) {
+    return nothing(`error: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
