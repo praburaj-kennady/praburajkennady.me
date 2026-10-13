@@ -262,6 +262,19 @@
     text-align: center;
     padding: 28px 0;
   }
+  /* The planet over the first line: 240px square, 200px on a phone. */
+  .hero-orb {
+    display: block;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 16px;
+  }
+  @media (max-width: 480px) {
+    .hero-orb {
+      width: 200px;
+      height: 200px;
+    }
+  }
   /* The first line, set in Title 1; the line under it in Reading. */
   .hero .lede {
     font-size: 1.375rem; /* 22px */
