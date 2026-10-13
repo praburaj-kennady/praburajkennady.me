@@ -119,7 +119,7 @@ export function PixelBloom({ className }: { className?: string }) {
     for (let n = 0; n < count; n++) {
       const o = n * STRIDE;
       sq[o + 6] = 0.85 + random() * 0.15;
-      sq[o + 7] = 0.4 + random() * 1.2;
+      sq[o + 7] = 0.5 + random() * 1.4;
       sq[o + 8] = (random() - 0.5) * 1.2;
     }
     let size = 0;
@@ -172,8 +172,8 @@ export function PixelBloom({ className }: { className?: string }) {
     /* One step of the springs and the push. Returns whether anything is
        still moving. */
     const step = () => {
-      const radius = size * 0.26;
-      const push = size * 1.6;
+      const radius = size * 0.3;
+      const push = size * 2.6;
       let moving = false;
       for (let n = 0; n < count; n++) {
         const o = n * STRIDE;
