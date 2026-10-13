@@ -139,14 +139,22 @@
 }
 
 @layer components {
-  /* The one page: a single message, centred in the window. */
+  /* The one page: a single message, centred in the window. It is pinned
+     to the visible window rather than sized from it, so on a phone it
+     never runs taller than the screen (100vh counts the space behind the
+     browser's toolbars in some browsers) and there is nothing to scroll. */
   .holding {
-    position: relative;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
     display: grid;
     place-items: center;
-    min-height: 100vh;
-    min-height: 100svh;
-    padding: 28px 20px;
+    /* Clear of the notch and the home indicator where a phone has them. */
+    padding:
+      max(28px, env(safe-area-inset-top))
+      max(20px, env(safe-area-inset-right))
+      max(28px, env(safe-area-inset-bottom))
+      max(20px, env(safe-area-inset-left));
     text-align: center;
   }
   .holding h1 {
