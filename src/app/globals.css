@@ -147,11 +147,12 @@
 
 
 @layer components {
-  /* One column, 40rem wide, centred. The page may draw under a phone's
+  /* One column, 640px of content (as the Figma Header and Footer),
+     centred. The page may draw under a phone's
      notch and home indicator (viewport-fit=cover, in layout.tsx), so its
      padding keeps the content clear of them. */
   .page {
-    max-width: 40rem;
+    max-width: 42.5rem; /* 640px + 20px each side */
     margin: 0 auto;
     padding:
       max(28px, env(safe-area-inset-top))
@@ -261,6 +262,18 @@
     text-align: center;
     padding: 28px 0;
   }
+  /* The first line, set in Title 1; the line under it in Reading. */
+  .hero .lede {
+    font-size: 1.375rem; /* 22px */
+    line-height: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    text-wrap: wrap; /* breaks where the Figma frame does */
+    margin: 0 0 12px;
+  }
+  .hero .lede + p {
+    margin: 0;
+  }
   .hero h1 {
     margin: 0 0 12px;
   }
@@ -271,12 +284,14 @@
     justify-content: center;
     gap: 12px;
     flex-wrap: wrap;
-    margin: 28px 0 0;
+    margin: 32px 0 0;
   }
   .links a {
     background: var(--raised);
     color: var(--text);
-    font-weight: 800;
+    font-size: 1.125rem; /* 18px, Title 2 */
+    line-height: 1.5rem;
+    font-weight: 700;
     text-decoration: none;
     padding: 12px 22px;
     border-radius: 999px;
@@ -306,15 +321,17 @@
     padding-top: 20px;
     border-top: 1px solid var(--line);
     color: var(--muted);
-    font-size: 0.9375rem; /* 15px */
-    font-weight: 700;
+    font-size: 0.9375rem; /* 15px, Callout */
+    line-height: 1.25rem;
+    font-weight: 600;
     display: grid;
     grid-template-columns: 1fr auto;
     column-gap: 16px;
+    row-gap: 6px;
   }
   .site-footer p {
     color: var(--muted);
-    margin: 0 0 6px;
+    margin: 0;
     grid-column: 1;
   }
   .site-footer .footer-pages {
@@ -330,7 +347,11 @@
       gap: 16px;
     }
     .site-footer {
-      display: block;
+      grid-template-columns: 1fr;
+    }
+    .site-footer .footer-pages {
+      grid-column: 1;
+      grid-row: auto;
     }
   }
   /* Kept on one line, until the window is too narrow for it and the nav. */

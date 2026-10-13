@@ -13,7 +13,7 @@ export const profile = {
     "Praburaj Kennady, product builder shipping initiative ideas into usable products with AI.",
   taglineDetail:
     "Currently working at Zoho with 6 years of experience across enterprise and consumer products, on iOS, Android, and TV.",
-  email: "praburajkennady.design@gmail.com",
+  email: "hello@praburajkennady.me",
 };
 
 /** The pages, in the nav's order, with the line that opens each. */
@@ -28,8 +28,11 @@ export const pages = {
   },
 };
 
+/** The footer's credit: "<site>, designed by <name>." with the name
+    linking home. */
 export const footer = {
-  credit: "Designed and built by Praburaj Kennady.",
+  site: "praburajkennady.me",
+  designedBy: "designed by",
 };
 
 /** Flip to true once public/resume/resume.pdf exists. */

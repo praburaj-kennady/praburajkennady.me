@@ -4,12 +4,14 @@ import { ArrivalFocus } from "@/components/arrival-focus";
 import { profile } from "@/content/site";
 import "./globals.css";
 
-/* Nunito in the four weights the style uses: the same static files the
+/* Nunito in the five weights the style uses: the same static files the
    Zwap site serves (fonts/, under the SIL Open Font License in OFL.txt),
-   so the text draws at the same weight. */
+   so the text draws at the same weight. SemiBold, which the Zwap site
+   doesn't use, is the same Nunito 3.602 design, instanced at 600. */
 const nunito = localFont({
   src: [
     { path: "./fonts/Nunito-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Nunito-SemiBold.woff2", weight: "600", style: "normal" },
     { path: "./fonts/Nunito-Bold.woff2", weight: "700", style: "normal" },
     { path: "./fonts/Nunito-ExtraBold.woff2", weight: "800", style: "normal" },
     { path: "./fonts/Nunito-Black.woff2", weight: "900", style: "normal" },
