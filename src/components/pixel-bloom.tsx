@@ -4,33 +4,49 @@ import { useEffect, useRef } from "react";
 import { PORTRAIT_PATHS } from "@/components/pixel-art";
 
 /* The figure in headphones, drawn as a grid of small squares that move.
-   Each of the drawing's pixels is split into 3 × 3 squares with a hair of
-   space between them. Each square has a home, and a spring pulls it there.
-   The pointer pushes the squares near it away; they scatter, take on the
-   brand blue (--accent) as they go, and spring back into the figure, in
-   --inverse, as the pointer moves on. On a touch screen a finger does the
-   same. When the page is first shown the squares gather from a loose
-   scatter into the figure. Under Reduce Motion the figure is drawn still.
-   With nothing moving, it stops drawing. */
+   Each of the drawing's pixels is split into 2 × 2 squares with a hair of
+   space between them. The squares take the warm palette of Oriku's
+   "Digital Bloom" poster, in patches: mostly peach and amber, with salmon,
+   coral, pink and a little periwinkle and violet. Each square has a home,
+   and a soft spring pulls it there. The pointer sprays the squares near it
+   outward, each at its own strength and a little off the straight line, so
+   they spread loosely, drift, and settle back into the figure as the
+   pointer moves on. On a touch screen a finger does the same. When the page
+   is first shown the squares gather from a loose scatter into the figure.
+   Under Reduce Motion the figure is drawn still. With nothing moving, it
+   stops drawing. The colours are the same in light and dark. */
 
 const ART = 240; // the drawing's own size
 const PIXELS = 21; // its pixels a side
-const SPLIT = 3; // squares per pixel, a side
-const GAP = 0.18; // space between squares, as a share of a square's cell
+const SPLIT = 2; // squares per pixel, a side
+const GAP = 0.2; // space between squares, as a share of a square's cell
+const STRIDE = 9; // numbers kept per square
+
+/* The poster's colours, in the order the patches run, each with its share
+   of the squares. */
+const PALETTE: [string, number][] = [
+  ["#F0B050", 0.22], // amber
+  ["#F0B070", 0.3], // peach
+  ["#F09070", 0.14], // salmon
+  ["#F05070", 0.1], // coral
+  ["#F05090", 0.12], // pink
+  ["#7070F0", 0.07], // periwinkle
+  ["#5030B0", 0.05], // violet
+];
+
+/* A small seeded random, so the patches fall the same way on every visit. */
+function seeded(seed: number) {
+  let t = seed >>> 0;
+  return () => {
+    t = (t + 0x6d2b79f5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 const clamp = (v: number, lo: number, hi: number) =>
   Math.min(hi, Math.max(lo, v));
-
-function parseColor(value: string, fallback: [number, number, number]) {
-  const hex = value.trim().match(/^#([0-9a-f]{6})$/i);
-  if (hex) {
-    const n = parseInt(hex[1], 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255] as [number, number, number];
-  }
-  const parts = value.match(/\d+(\.\d+)?/g);
-  if (parts && parts.length >= 3) return [+parts[0], +parts[1], +parts[2]] as [number, number, number];
-  return fallback;
-}
 
 export function PixelBloom({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,7 +57,6 @@ export function PixelBloom({ className }: { className?: string }) {
     if (!canvas || !ctx) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const darkScheme = window.matchMedia("(prefers-color-scheme: dark)");
 
     // Which squares the drawing covers, read once from its paths.
     const grid = PIXELS * SPLIT;
@@ -58,21 +73,51 @@ export function PixelBloom({ className }: { className?: string }) {
         if (alpha[(j * grid + i) * 4 + 3] > 127) cells.push(i, j);
     const count = cells.length / 2;
 
-    // Per square: home x, home y, x, y, velocity x, velocity y, shade.
-    const sq = new Float32Array(count * 7);
+    /* Each square's colour: a smooth field of noise over the grid, with a
+       little grain, ranked, and cut into the palette's shares, so the
+       colours lie in patches that fray at their edges. */
+    const random = seeded(175);
+    const coarse = 6;
+    const knots = Array.from({ length: (coarse + 1) ** 2 }, random);
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    const field = (u: number, v: number) => {
+      const x = u * coarse;
+      const y = v * coarse;
+      const i = Math.min(coarse - 1, Math.floor(x));
+      const j = Math.min(coarse - 1, Math.floor(y));
+      const fx = smooth(x - i);
+      const fy = smooth(y - j);
+      const k = (a: number, b: number) => knots[b * (coarse + 1) + a];
+      const top = k(i, j) + (k(i + 1, j) - k(i, j)) * fx;
+      const bottom = k(i, j + 1) + (k(i + 1, j + 1) - k(i, j + 1)) * fx;
+      return top + (bottom - top) * fy;
+    };
+    const order = Array.from({ length: count }, (_, n) => ({
+      n,
+      v: field(cells[n * 2] / grid, cells[n * 2 + 1] / grid) + (random() - 0.5) * 0.12,
+    })).sort((a, b) => a.v - b.v);
+    const color = new Array<string>(count);
+    let from = 0;
+    PALETTE.forEach(([hex, share], index) => {
+      const to = index === PALETTE.length - 1 ? count : from + Math.round(share * count);
+      for (let r = from; r < to; r++) color[order[r].n] = hex;
+      from = to;
+    });
+
+    /* Per square: home x, home y, x, y, velocity x, velocity y, shade, how
+       hard the pointer throws it, and how far off the straight line. */
+    const sq = new Float32Array(count * STRIDE);
+    for (let n = 0; n < count; n++) {
+      const o = n * STRIDE;
+      sq[o + 6] = 0.85 + random() * 0.15;
+      sq[o + 7] = 0.4 + random() * 1.2;
+      sq[o + 8] = (random() - 0.5) * 1.2;
+    }
     let size = 0;
     let cell = 0;
-    let ink: [number, number, number] = [17, 17, 17];
-    let blue: [number, number, number] = [6, 87, 220];
     const pointer = { x: 0, y: 0, active: false };
     let frame = 0;
     let running = false;
-
-    const readColors = () => {
-      const style = getComputedStyle(canvas);
-      ink = parseColor(style.getPropertyValue("--inverse"), [17, 17, 17]);
-      blue = parseColor(style.getPropertyValue("--accent"), [6, 87, 220]);
-    };
 
     const layout = (scatter: boolean) => {
       const rect = canvas.getBoundingClientRect();
@@ -83,7 +128,7 @@ export function PixelBloom({ className }: { className?: string }) {
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       cell = size / grid;
       for (let n = 0; n < count; n++) {
-        const o = n * 7;
+        const o = n * STRIDE;
         const hx = (cells[n * 2] + 0.5) * cell;
         const hy = (cells[n * 2 + 1] + 0.5) * cell;
         sq[o] = hx;
@@ -100,25 +145,17 @@ export function PixelBloom({ className }: { className?: string }) {
         }
         sq[o + 4] = 0;
         sq[o + 5] = 0;
-        sq[o + 6] = 0.82 + Math.random() * 0.18;
       }
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, size, size);
       const s = cell * (1 - GAP);
-      const reach = cell * 9; // how far from home a square is fully blue
       for (let n = 0; n < count; n++) {
-        const o = n * 7;
-        const x = sq[o + 2];
-        const y = sq[o + 3];
-        const away = Math.min(1, Math.hypot(x - sq[o], y - sq[o + 1]) / reach);
-        const r = Math.round(ink[0] + (blue[0] - ink[0]) * away);
-        const g = Math.round(ink[1] + (blue[1] - ink[1]) * away);
-        const b = Math.round(ink[2] + (blue[2] - ink[2]) * away);
+        const o = n * STRIDE;
         ctx.globalAlpha = sq[o + 6];
-        ctx.fillStyle = `rgb(${r} ${g} ${b})`;
-        ctx.fillRect(x - s / 2, y - s / 2, s, s);
+        ctx.fillStyle = color[n];
+        ctx.fillRect(sq[o + 2] - s / 2, sq[o + 3] - s / 2, s, s);
       }
       ctx.globalAlpha = 1;
     };
@@ -126,29 +163,34 @@ export function PixelBloom({ className }: { className?: string }) {
     /* One step of the springs and the push. Returns whether anything is
        still moving. */
     const step = () => {
-      const radius = size * 0.24;
-      const push = size * 1.4;
+      const radius = size * 0.26;
+      const push = size * 1.6;
       let moving = false;
       for (let n = 0; n < count; n++) {
-        const o = n * 7;
+        const o = n * STRIDE;
         let vx = sq[o + 4];
         let vy = sq[o + 5];
         const x = sq[o + 2];
         const y = sq[o + 3];
-        vx += (sq[o] - x) * 0.06;
-        vy += (sq[o + 1] - y) * 0.06;
+        vx += (sq[o] - x) * 0.035;
+        vy += (sq[o + 1] - y) * 0.035;
         if (pointer.active) {
           const dx = x - pointer.x;
           const dy = y - pointer.y;
           const d = Math.hypot(dx, dy);
           if (d < radius && d > 0.001) {
-            const f = Math.pow(1 - d / radius, 2) * push * 0.016;
-            vx += (dx / d) * f;
-            vy += (dy / d) * f;
+            // Thrown outward, at this square's strength and slant.
+            const f = Math.pow(1 - d / radius, 2) * push * 0.016 * sq[o + 7];
+            const cos = Math.cos(sq[o + 8]);
+            const sin = Math.sin(sq[o + 8]);
+            const ux = dx / d;
+            const uy = dy / d;
+            vx += (ux * cos - uy * sin) * f;
+            vy += (ux * sin + uy * cos) * f;
           }
         }
-        vx *= 0.82;
-        vy *= 0.82;
+        vx *= 0.88;
+        vy *= 0.88;
         sq[o + 2] = x + vx;
         sq[o + 3] = y + vy;
         sq[o + 4] = vx;
@@ -202,12 +244,6 @@ export function PixelBloom({ className }: { className?: string }) {
       pointer.active = false;
     };
 
-    const restyle = () => {
-      readColors();
-      if (!running) draw();
-    };
-
-    readColors();
     if (reduceMotion.matches) {
       still();
     } else {
@@ -225,9 +261,6 @@ export function PixelBloom({ className }: { className?: string }) {
       draw();
     });
     resize.observe(canvas);
-    const theme = new MutationObserver(restyle);
-    theme.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-    darkScheme.addEventListener("change", restyle);
     reduceMotion.addEventListener("change", still);
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onMove, { passive: true });
@@ -242,8 +275,6 @@ export function PixelBloom({ className }: { className?: string }) {
     return () => {
       cancelAnimationFrame(frame);
       resize.disconnect();
-      theme.disconnect();
-      darkScheme.removeEventListener("change", restyle);
       reduceMotion.removeEventListener("change", still);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onMove);

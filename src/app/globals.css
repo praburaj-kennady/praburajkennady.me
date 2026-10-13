@@ -263,13 +263,12 @@
     padding: 28px 0;
   }
   /* The portrait over the first line, 40px above it: 240px square,
-     200px on a phone, in the --inverse colour. */
+     200px on a phone, in the poster's colours. */
   .hero-art {
     display: block;
     width: 240px;
     height: 240px;
     margin: 0 auto 40px;
-    color: var(--inverse);
     /* A finger dragged across it scatters the squares; the page still
        scrolls up and down. */
     touch-action: pan-y;
