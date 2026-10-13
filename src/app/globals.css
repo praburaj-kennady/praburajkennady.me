@@ -17,6 +17,8 @@
   --muted: #6e6e73; /*  5.1:1 */
   --line: #e5e5ea; /* decorative only */
   --accent: #0657dc; /*  6.2:1 */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drift: cubic-bezier(0.16, 1, 0.3, 1); /* the Zwap app's moduleDrift */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -129,6 +131,11 @@
     outline-offset: 3px;
     border-radius: 6px;
   }
+  /* After a change of page, its heading takes focus for a screen reader
+     to read on from (ArrivalFocus). It is not a control: no ring. */
+  h1[tabindex="-1"]:focus {
+    outline: none;
+  }
 
   @media (max-width: 480px) {
     h1 {
@@ -138,58 +145,328 @@
   }
 }
 
+
 @layer components {
-  /* The one page: a single message, centred in the window. */
-  .holding {
-    position: relative;
-    display: grid;
-    place-items: center;
-    min-height: 100vh;
-    min-height: 100svh;
-    padding: 28px 20px;
-    text-align: center;
+  /* One column, 40rem wide, centred. */
+  .page {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 28px 20px 56px;
   }
-  .holding h1 {
-    position: relative;
-    margin: 0;
-    animation: settle-in 1100ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+
+  /* The name stands in for a logo: Black, in the text colour. */
+  .wordmark {
+    color: var(--text);
+    font-weight: 900;
+    text-decoration: none;
   }
-  @media (prefers-reduced-motion: reduce) {
-    .holding h1 {
-      animation: fade-in 800ms ease-out 100ms both;
+
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    view-transition-name: site-header;
+  }
+  .site-header .wordmark {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.75rem;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+  .site-nav {
+    display: flex;
+    gap: 20px;
+  }
+  .site-nav a {
+    color: var(--text-2);
+    font-weight: 700;
+    text-decoration: none;
+    padding: 8px 0;
+    transition: color 150ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .site-nav a:hover {
+      color: var(--text);
     }
   }
-  /* The field stops short of the left and right edges of the window. */
-  .holding-squares {
-    position: absolute;
-    inset: 0 clamp(20px, 8vw, 128px);
-    width: calc(100% - 2 * clamp(20px, 8vw, 128px));
-    height: 100%;
-    pointer-events: none;
-    /* Fade the field out towards the left and right edges: clear at the
-       very edge, full only across the middle third. */
-    mask-image: linear-gradient(
-      to right,
-      transparent 4%,
-      #000 35%,
-      #000 65%,
-      transparent 96%
-    );
+  .site-nav a[aria-current="page"] {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  .lede {
+    font-size: 1.1875rem; /* 19px */
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 700;
+    margin: 0 0 24px;
+  }
+
+  /* A raised panel, for the things a page wants to stand out. */
+  .card {
+    background: var(--raised);
+    border-radius: 24px;
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .card h2 {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.5rem;
+    letter-spacing: 0;
+    margin: 0 0 4px;
+  }
+  .card .meta {
+    margin: 0 0 8px;
+  }
+  .card > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* The home page fills the window. Its hero stands midway between the
+     top of the window and the footer's rule, and the footer at the
+     window's foot. In a window too short for both, the page scrolls. */
+  .home {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .home main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hero {
+    text-align: center;
+    padding: 56px 0 28px;
+  }
+  .hero h1 {
+    margin: 0 0 12px;
+  }
+
+  /* A row of grey pills, to the other pages. */
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 28px 0 0;
+  }
+  .links a {
+    background: var(--raised);
+    color: var(--text);
+    font-weight: 800;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 999px;
+    transition:
+      background-color 150ms ease,
+      transform 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .links a:hover {
+      background: var(--line);
+    }
+  }
+  .links a:active {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .links a:active {
+      transform: none;
+    }
+  }
+
+  /* The footer's lines stand on the left, and a link to another page on
+     the right of the first line, as the header sets the name and the nav.
+     On a phone there is no room beside it, and the lines stack. */
+  .site-footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 700;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 16px;
+  }
+  .site-footer p {
+    color: var(--muted);
+    margin: 0 0 6px;
+    grid-column: 1;
+  }
+  .site-footer .footer-pages {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .site-footer a {
+    color: var(--text-2);
+  }
+
+  @media (max-width: 480px) {
+    .site-nav {
+      gap: 16px;
+    }
+    .site-footer {
+      display: block;
+    }
+  }
+  /* Kept on one line, until the window is too narrow for it and the nav. */
+  @media (max-width: 360px) {
+    .site-header .wordmark {
+      white-space: normal;
+    }
   }
 }
 
-/* The message settles in once, when the page is first shown: it rises a
-   few pixels and comes into focus as it fades in. Under Reduce Motion it
-   only fades. */
-@keyframes settle-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-    filter: blur(6px);
+/* ————————————————————————————————————————————————————————————————
+   Page transitions, from the Zwap site. The header is one fixed layer:
+   it never moves with a page or scales, and only the content under it
+   changes.
+   - Between Work and Experience the content changes as the Zwap app's
+     tabs do: a 0.1s crossfade while the old content drifts 32px towards
+     its side of the nav and the new comes in 32px from its own, landing
+     in 0.25s.
+   - To or from the home page, the old content scales down and fades out,
+     and the new zooms in to its size as it fades in after it.
+   PageLink names the kind of change, and PageTransition turns the name
+   into a class on the content. A change with no name (Back, Forward), or
+   any change under Reduce Motion, only crossfades.
+   ———————————————————————————————————————————————————————————————— */
+
+/* What shows around the content while it is scaled down or moved aside.
+   Clicks pass through to the page underneath. */
+::view-transition {
+  background: var(--base);
+  pointer-events: none;
+}
+/* The rest of the page, behind the content, changes at once. */
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+/* The header keeps still. It is drawn from the new page from the first
+   frame; where the old page was scrolled a little, it glides back to its
+   place. */
+::view-transition-group(site-header) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-old(site-header) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(site-header) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* The content crossfades: 0.1s ease-out, the app's moduleFade. Where only
+   one of the two pages has a header (the home page has none), it fades
+   where it stands, with the content. */
+::view-transition-old(.page-fade),
+::view-transition-old(.zoom),
+::view-transition-old(.slide-forward),
+::view-transition-old(.slide-backward),
+::view-transition-old(site-header):only-child {
+  animation: page-out 100ms ease-out both;
+  opacity: 1;
+}
+::view-transition-new(.page-fade),
+::view-transition-new(.zoom),
+::view-transition-new(.slide-forward),
+::view-transition-new(.slide-backward),
+::view-transition-new(site-header):only-child {
+  animation: page-in 100ms ease-out both;
+}
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(.slide-forward) {
+    animation:
+      page-out 100ms ease-out both,
+      drift-to-left 250ms var(--ease-drift) both;
+  }
+  ::view-transition-new(.slide-forward) {
+    animation:
+      page-in 100ms ease-out both,
+      drift-from-right 250ms var(--ease-drift) both;
+  }
+  ::view-transition-old(.slide-backward) {
+    animation:
+      page-out 100ms ease-out both,
+      drift-to-right 250ms var(--ease-drift) both;
+  }
+  ::view-transition-new(.slide-backward) {
+    animation:
+      page-in 100ms ease-out both,
+      drift-from-left 250ms var(--ease-drift) both;
+  }
+  ::view-transition-old(.zoom) {
+    animation:
+      page-out 150ms linear both,
+      zoom-out 150ms ease both;
+  }
+  ::view-transition-new(.zoom) {
+    animation:
+      page-in 180ms var(--ease-out) 90ms both,
+      zoom-in 270ms var(--ease-out) 90ms both;
+  }
+  :root:active-view-transition-type(zoom)::view-transition-old(site-header):only-child {
+    animation: page-out 150ms linear both;
+  }
+  :root:active-view-transition-type(zoom)::view-transition-new(site-header):only-child {
+    animation: page-in 180ms var(--ease-out) 90ms both;
   }
 }
-@keyframes fade-in {
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-in {
   from {
     opacity: 0;
+  }
+}
+@keyframes drift-to-left {
+  to {
+    transform: translateX(-32px);
+  }
+}
+@keyframes drift-from-right {
+  from {
+    transform: translateX(32px);
+  }
+}
+@keyframes drift-to-right {
+  to {
+    transform: translateX(32px);
+  }
+}
+@keyframes drift-from-left {
+  from {
+    transform: translateX(-32px);
+  }
+}
+@keyframes zoom-out {
+  to {
+    transform: scale(0.94);
+  }
+}
+@keyframes zoom-in {
+  from {
+    transform: scale(0.92);
   }
 }

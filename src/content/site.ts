@@ -13,6 +13,22 @@ export const profile = {
   email: "praburajkennady.design@gmail.com",
 };
 
+/** The pages, in the nav's order, with the line that opens each. */
+export const pages = {
+  work: {
+    title: "Work",
+    lede: "What I've shipped, what's in progress, and what I make for the craft of it.",
+  },
+  experience: {
+    title: "Experience",
+    lede: "Five years of product design, most of them at Zoho, with independent work alongside.",
+  },
+};
+
+export const footer = {
+  credit: "Designed and built by Praburaj Kennady.",
+};
+
 /** Flip to true once public/resume/resume.pdf exists. */
 export const resumeAvailable = false;
 

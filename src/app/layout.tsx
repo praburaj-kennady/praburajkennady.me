@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
+import { ArrivalFocus } from "@/components/arrival-focus";
 import "./globals.css";
 
 /* Nunito in the four weights the style uses. next/font serves the files
@@ -14,7 +15,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Praburaj Kennady — Product Designer",
   description:
-    "Product designer shipping designs into products with AI. This site is being built.",
+    "Product designer shipping designs into products with AI. Five years across consumer and enterprise, on Android, iOS, and TV.",
 };
 
 export const viewport: Viewport = {
@@ -24,7 +25,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${nunito.variable} antialiased`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <ArrivalFocus />
+      </body>
     </html>
   );
 }
