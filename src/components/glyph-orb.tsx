@@ -7,8 +7,9 @@ import { useEffect, useRef } from "react";
    sunlight gives it a brightness, and the brightness picks a character,
    from a thin "." in the shade to a dense "@" where the sun is full on it.
    The planet turns slowly about a tilted axis, and its bands swirl a
-   little as it turns. The characters take the page's --text and --text-2
-   colours, so the planet follows light and dark. On a fine pointer the
+   little as it turns. The characters are the brand blue, --accent: full
+   where the sun is on them, and on the night side a softer tint, mixed
+   towards the page's --base, so the planet follows light and dark. On a fine pointer the
    sun follows the pointer around the planet, and drifts back when the
    pointer leaves. Under Reduce Motion it draws one still frame. It pauses
    while it is off screen. */
@@ -84,8 +85,8 @@ export function GlyphOrb({
 
     let width = 0;
     let height = 0;
-    let lit: [number, number, number] = [17, 17, 17];
-    let shade: [number, number, number] = [85, 85, 85];
+    let lit: [number, number, number] = [6, 87, 220];
+    let shade: [number, number, number] = [130, 171, 237];
     let font = "";
     let frame = 0;
     let visible = true;
@@ -98,8 +99,10 @@ export function GlyphOrb({
 
     const readColors = () => {
       const style = getComputedStyle(canvas);
-      lit = parseColor(style.getPropertyValue("--text").trim() || "#111111");
-      shade = parseColor(style.getPropertyValue("--text-2").trim() || "#555555");
+      lit = parseColor(style.getPropertyValue("--accent").trim() || "#0657dc");
+      const base = parseColor(style.getPropertyValue("--base").trim() || "#ffffff");
+      // The night side: the blue, half way to the page.
+      shade = [0, 1, 2].map((k) => Math.round(lit[k] + (base[k] - lit[k]) * 0.5)) as [number, number, number];
       const family = style.fontFamily || "ui-monospace, monospace";
       font = `700 ${glyphSize}px ${family}`;
     };
