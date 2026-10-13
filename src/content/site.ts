@@ -9,7 +9,7 @@ export const profile = {
   name: "praburaj kennady",
   tagline: "Product designer shipping designs into products with AI.",
   taglineDetail:
-    "Five years across consumer and enterprise, on Android, iOS, and TV.",
+    "Currently working at Zoho with 6 years of experience across enterprise and consumer products, on iOS, Android, and TV.",
   email: "praburajkennady.design@gmail.com",
 };
 
@@ -21,7 +21,7 @@ export const pages = {
   },
   experience: {
     title: "Experience",
-    lede: "Five years of product design, most of them at Zoho, with independent work alongside.",
+    lede: "Six years of product design, most of them at Zoho, with independent work alongside.",
   },
 };
 
