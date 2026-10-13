@@ -278,6 +278,37 @@
       height: 200px;
     }
   }
+  /* The portrait's wrap holds the song's name, which sits in the 40px
+     under the picture without taking room, so nothing moves when it
+     shows: Callout, in --text-2, the title a plain link, on one line
+     (cut with an ellipsis when it is too long for the column). */
+  .hero-art-wrap {
+    position: relative;
+  }
+  .now-playing {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding-top: 10px;
+    font-size: 0.9375rem; /* 15px, Callout */
+    line-height: 1.25rem;
+    font-weight: 600;
+    color: var(--text-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .now-playing a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .now-playing a:hover {
+      text-decoration: underline;
+    }
+  }
 
   /* At rest the portrait is the plain drawing: eyes open, nothing around
      him. While he listens (data-listening, set by HeroPortrait from real

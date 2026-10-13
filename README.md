@@ -21,3 +21,13 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000).
 
 All site copy lives in `src/content/site.ts` — one file to edit when case-study write-ups land.
+
+## Now playing
+
+Move the mouse over the portrait and he listens to whatever is playing on my Spotify (or the last thing played). `src/app/api/now-playing/route.ts` asks Spotify, cached 30s at the edge; the portrait fetches it once per visit. It needs three secrets, set in Vercel (and in `.env.local` to run it locally; see `.env.example`):
+
+1. Make an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) with the redirect URI `http://127.0.0.1:8888/callback`. Copy its client ID and secret.
+2. `SPOTIFY_CLIENT_ID=… SPOTIFY_CLIENT_SECRET=… node scripts/spotify-token.mjs` — approve in the browser; it prints `SPOTIFY_REFRESH_TOKEN`.
+3. Add the three as environment variables on the Vercel project and redeploy.
+
+Without them the route answers `{ track: null }` and the portrait just listens.
