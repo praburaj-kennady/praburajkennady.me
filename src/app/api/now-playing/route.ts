@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
    three secrets (set up once through /api/spotify/connect; README › Now playing): SPOTIFY_CLIENT_ID,
    SPOTIFY_CLIENT_SECRET and SPOTIFY_REFRESH_TOKEN. Without them, or if
    Spotify is down, it answers { track: null } rather than failing. The
-   answer is cached at the edge for 30s, so a burst of visitors is one
+   answer is cached at the edge for 10s, so a burst of visitors is one
    call to Spotify. */
 
 export const dynamic = "force-dynamic";
@@ -26,6 +26,31 @@ export interface NowPlaying {
 
 const TOKEN = "https://accounts.spotify.com/api/token";
 const PLAYING = "https://api.spotify.com/v1/me/player/currently-playing";
+const DEVICES = "https://api.spotify.com/v1/me/player/devices";
+
+interface Device {
+  type: string;
+  is_active: boolean;
+  is_private_session: boolean;
+  is_restricted: boolean;
+}
+
+/* When Spotify says nothing is playing (204), which devices it can see
+   and their state, for a look by hand: "iphone active private session,
+   computer". No names, which could be anyone's. */
+const devices = async (headers: HeadersInit) => {
+  const res = await fetch(DEVICES, { headers, cache: "no-store" });
+  if (!res.ok) return `devices: ${res.status}`;
+  const { devices } = (await res.json()) as { devices: Device[] };
+  if (!devices.length) return "devices: none";
+  return `devices: ${devices
+    .map((d) =>
+      [d.type.toLowerCase(), d.is_active && "active", d.is_private_session && "private session", d.is_restricted && "restricted"]
+        .filter(Boolean)
+        .join(" "),
+    )
+    .join(", ")}`;
+};
 
 interface Track {
   name: string;
@@ -79,8 +104,9 @@ export async function GET() {
     const headers = { Authorization: `Bearer ${access_token}` };
 
     const now = await fetch(PLAYING, { headers, cache: "no-store" });
-    // 204: nothing playing. Paused counts as not playing. Podcasts have
-    // no track item.
+    // 204: nothing playing, as far as Spotify can see; say what it sees.
+    // Paused counts as not playing. Podcasts have no track item.
+    if (now.status === 204) return nothing(`now playing: 204; ${await devices(headers)}`);
     if (now.status !== 200) return nothing(`now playing: ${now.status}`);
     const data = (await now.json()) as { is_playing: boolean; item: Track | null; currently_playing_type: string };
     if (!data.is_playing) return nothing("now playing: paused");
