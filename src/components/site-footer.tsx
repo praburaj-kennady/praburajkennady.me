@@ -3,7 +3,8 @@ import { profile, socials } from "@/content/site";
 
 const marks = { X: XMark, LinkedIn: LinkedInMark };
 
-/* The email on the left; on the right, a mark for each profile. */
+/* The email on the left; on the right, a mark for each profile, opening
+   in a new tab so the site stays put. */
 export function SiteFooter() {
   return (
     <footer className="site-footer" id="site-footer">
@@ -14,7 +15,13 @@ export function SiteFooter() {
         {socials.map(({ name, href }) => {
           const Mark = marks[name];
           return (
-            <a key={name} href={href} rel="me" aria-label={`${profile.fullName} on ${name}`}>
+            <a
+              key={name}
+              href={href}
+              target="_blank"
+              rel="me noopener noreferrer"
+              aria-label={`${profile.fullName} on ${name} (opens in a new tab)`}
+            >
               <Mark />
             </a>
           );
