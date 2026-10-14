@@ -11,17 +11,16 @@ import { PixelPortrait } from "@/components/pixel-art";
    mouse has moved a few pixels over him, and stops when it leaves. On a
    touch screen a tap starts the song, and the next tap stops it.
 
-   While he listens, a line under him says what the song is: the track
-   playing on my Spotify, or the last one played, fetched once from
-   /api/now-playing the first time he listens. With nothing known, no
-   line. */
+   While he listens, a card beside him says what is playing on my
+   Spotify right now, from /api/now-playing, asked each time he starts
+   listening (the answer is cached 30s at the edge). It shows only while
+   a track is actually playing; otherwise there is just the song. */
 const NUDGE = 4; // px of movement that counts as the mouse arriving
 
 export function HeroPortrait({ className }: { className?: string }) {
   const [listening, setListening] = useState(false);
   const [track, setTrack] = useState<NowPlaying["track"]>(null);
   const from = useRef<{ x: number; y: number } | null>(null);
-  const asked = useRef(false);
 
   useEffect(() => {
     const stop = () => setListening(false);
@@ -30,13 +29,12 @@ export function HeroPortrait({ className }: { className?: string }) {
   }, []);
 
   useEffect(() => {
-    if (!listening || asked.current) return;
-    asked.current = true;
+    if (!listening) return;
     let live = true;
     fetch("/api/now-playing")
       .then((r) => (r.ok ? (r.json() as Promise<NowPlaying>) : { track: null }))
       .then((data) => live && setTrack(data.track))
-      .catch(() => {});
+      .catch(() => live && setTrack(null));
     return () => {
       live = false;
     };
@@ -65,13 +63,20 @@ export function HeroPortrait({ className }: { className?: string }) {
         }}
       />
       {listening && track && (
-        <p className="now-playing">
-          <span className="now-playing-label">{track.playing ? "Listening to" : "Last played"}</span>{" "}
-          <a href={track.url} target="_blank" rel="noopener noreferrer">
-            {track.title}
-          </a>{" "}
-          <span className="now-playing-by">by {track.artist}</span>
-        </p>
+        <a className="now-playing" href={track.url} target="_blank" rel="noopener noreferrer">
+          {track.art ? (
+            // Spotify's CDN, a different URL per album: no next/image.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="now-playing-art" src={track.art} alt="" width={56} height={56} />
+          ) : (
+            <span className="now-playing-art" aria-hidden="true" />
+          )}
+          <span className="now-playing-text">
+            <span className="now-playing-label">Listening to</span>
+            <span className="now-playing-title">{track.title}</span>
+            <span className="now-playing-by">{track.artist}</span>
+          </span>
+        </a>
       )}
     </div>
   );

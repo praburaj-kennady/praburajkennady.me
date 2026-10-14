@@ -278,38 +278,86 @@
       height: 200px;
     }
   }
-  /* The portrait's wrap holds the song's name, which sits in the 40px
-     under the picture without taking room, so nothing moves when it
-     shows: Callout, in --text-2, the title a plain link, on one line
-     (cut with an ellipsis when it is too long for the column). */
+  /* The song card, from the Figma frame: beside his head, on the right,
+     its left edge 224px in from the portrait's (over the headphone's
+     edge) and 16px down. Raised, 20px corners, the album art 56px with
+     12px corners, then "Listening to" in Caption 2, the title in Title 2
+     and the artists in Caption 1. It takes no room in the layout. On a
+     window too narrow for it beside the column it sits at the window's
+     foot instead, centred. */
   .hero-art-wrap {
     position: relative;
+    width: max-content;
+    margin: 0 auto;
   }
   .now-playing {
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin: 0;
-    padding-top: 10px;
-    font-size: 0.9375rem; /* 15px, Callout */
-    line-height: 1.25rem;
-    font-weight: 600;
-    color: var(--text-2);
+    top: 16px;
+    left: 224px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: max-content;
+    max-width: min(321px, calc(100vw - 32px));
+    padding: 8px 12px 8px 8px;
+    border-radius: 20px;
+    background: var(--raised);
+    color: var(--text);
+    text-decoration: none;
+    text-align: left;
+  }
+  .now-playing-art {
+    flex: none;
+    display: block;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: var(--line);
+    object-fit: cover;
+  }
+  .now-playing-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .now-playing-title {
+    margin-top: 2px;
+  }
+  .now-playing-text > span {
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .now-playing a {
-    color: var(--text);
-    text-decoration: none;
+  .now-playing-label {
+    font-size: 0.6875rem; /* 11px, Caption 2 */
+    line-height: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--muted);
   }
-  @media (hover: hover) and (pointer: fine) {
-    .now-playing a:hover {
-      text-decoration: underline;
+  .now-playing-title {
+    font-size: 1.125rem; /* 18px, Title 2 */
+    line-height: 1.5rem;
+    font-weight: 700;
+  }
+  .now-playing-by {
+    font-size: 0.75rem; /* 12px, Caption 1 */
+    line-height: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--text-2);
+  }
+  @media (max-width: 820px) {
+    .now-playing {
+      position: fixed;
+      top: auto;
+      left: 50%;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
     }
   }
-
   /* At rest the portrait is the plain drawing: eyes open, nothing around
      him. While he listens (data-listening, set by HeroPortrait from real
      pointer movement, or a tap) a slow song plays, animated as pixel art
@@ -318,7 +366,9 @@
      - Eyes: open, half shut, shut, in under a second, then they stay
        shut while the pointer stays.
      - The notes, heart and sparkles come in one after another over the
-       first few seconds (appear, with a delay each), not all at once.
+       first few seconds (appear, each for its own length), not all at
+       once: the small note first, then the big one, then the pair; the
+       song card last, once the notes are up.
      - Notes: each rises past his ear a pixel step at a time and fades,
        on its own beat, so there is always one in the air.
      - Heart: a slow beat, one step up and back.
@@ -346,35 +396,38 @@
     .hero-art[data-listening] .deco {
       animation: appear 1s linear forwards;
     }
-    .hero-art[data-listening] .deco-note-a {
-      animation-duration: 0.6s;
+    .hero-art[data-listening] .deco-note-c {
+      animation-duration: 0.4s;
     }
     .hero-art[data-listening] .deco-heart {
-      animation-duration: 1.4s;
+      animation-duration: 1s;
     }
     .hero-art[data-listening] .deco-note-b {
-      animation-duration: 1.8s;
+      animation-duration: 1.4s;
     }
     .hero-art[data-listening] .deco-sparkle-a {
+      animation-duration: 2s;
+    }
+    .hero-art[data-listening] .deco-note-a {
       animation-duration: 2.4s;
     }
-    .hero-art[data-listening] .deco-note-c {
+    .hero-art[data-listening] .deco-sparkle-b {
       animation-duration: 3s;
     }
-    .hero-art[data-listening] .deco-sparkle-b {
-      animation-duration: 3.6s;
+    .now-playing {
+      animation: appear 2.8s linear forwards;
     }
     .hero-art[data-listening] .note {
       animation: note-rise 3.6s step-end infinite both;
     }
-    .hero-art[data-listening] .note-a {
-      animation-delay: 0.6s;
+    .hero-art[data-listening] .note-c {
+      animation-delay: 0.4s;
     }
     .hero-art[data-listening] .note-b {
-      animation-delay: 1.8s;
+      animation-delay: 1.4s;
     }
-    .hero-art[data-listening] .note-c {
-      animation-delay: 3s;
+    .hero-art[data-listening] .note-a {
+      animation-delay: 2.4s;
     }
     .hero-art[data-listening] .heart {
       animation: heart-beat 2.4s step-end infinite;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-/* What I'm listening to on Spotify, for the home page's portrait. Reads
-   the track playing now, or the last one played when nothing is. Needs
+/* What I'm listening to on Spotify, for the home page's portrait: the
+   track playing right now on any of my devices, or nothing. Needs
    three secrets (set up once through /api/spotify/connect; README › Now playing): SPOTIFY_CLIENT_ID,
    SPOTIFY_CLIENT_SECRET and SPOTIFY_REFRESH_TOKEN. Without them, or if
    Spotify is down, it answers { track: null } rather than failing. The
@@ -19,19 +19,19 @@ export interface NowPlaying {
     title: string;
     artist: string;
     url: string;
-    /** True while it plays; false for the last track played. */
-    playing: boolean;
+    /** The album art, about 64px square, or null. */
+    art: string | null;
   } | null;
 }
 
 const TOKEN = "https://accounts.spotify.com/api/token";
 const PLAYING = "https://api.spotify.com/v1/me/player/currently-playing";
-const RECENT = "https://api.spotify.com/v1/me/player/recently-played?limit=1";
 
 interface Track {
   name: string;
   artists: { name: string }[];
   external_urls: { spotify: string };
+  album: { images: { url: string; width: number; height: number }[] };
 }
 
 const nothing = (reason: string) =>
@@ -47,12 +47,17 @@ const credit = (artists: { name: string }[]) => {
   return `${names[0]}, ${names[1]} & ${names.length - 2} more`;
 };
 
-const shape = (t: Track, playing: boolean): NowPlaying => ({
+/* Spotify lists the album's images largest first; the card shows 56px,
+   so the smallest one is plenty. */
+const art = (images: Track["album"]["images"]) =>
+  images.length ? images[images.length - 1].url : null;
+
+const shape = (t: Track): NowPlaying => ({
   track: {
     title: t.name,
     artist: credit(t.artists),
     url: t.external_urls.spotify,
-    playing,
+    art: art(t.album.images),
   },
 });
 
@@ -78,25 +83,14 @@ export async function GET() {
     const { access_token } = (await auth.json()) as { access_token: string };
     const headers = { Authorization: `Bearer ${access_token}` };
 
-    let body: NowPlaying = { track: null };
     const now = await fetch(PLAYING, { headers, cache: "no-store" });
-    // 204: nothing playing. Podcasts have no track item.
-    let reason = `now playing: ${now.status}`;
-    if (now.status === 200) {
-      const data = (await now.json()) as { is_playing: boolean; item: Track | null; currently_playing_type: string };
-      if (data.item && data.currently_playing_type === "track") body = shape(data.item, data.is_playing);
-      else reason = `now playing: ${data.currently_playing_type}`;
-    }
-    if (!body.track) {
-      const last = await fetch(RECENT, { headers, cache: "no-store" });
-      if (last.ok) {
-        const data = (await last.json()) as { items: { track: Track }[] };
-        if (data.items[0]) body = shape(data.items[0].track, false);
-        else body.reason = `${reason}; recently played: empty`;
-      } else {
-        body.reason = `${reason}; recently played: ${last.status}`;
-      }
-    }
+    // 204: nothing playing. Paused counts as not playing. Podcasts have
+    // no track item.
+    if (now.status !== 200) return nothing(`now playing: ${now.status}`);
+    const data = (await now.json()) as { is_playing: boolean; item: Track | null; currently_playing_type: string };
+    if (!data.is_playing) return nothing("now playing: paused");
+    if (!data.item || data.currently_playing_type !== "track") return nothing(`now playing: ${data.currently_playing_type}`);
+    const body = shape(data.item);
     return NextResponse.json(body, {
       headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
     });
