@@ -36,7 +36,7 @@ interface Track {
 
 const nothing = (reason: string) =>
   NextResponse.json({ track: null, reason } satisfies NowPlaying, {
-    headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
+    headers: { "Cache-Control": "public, s-maxage=10, stale-while-revalidate=20" },
   });
 
 /* Film songs credit many singers; the card names the first. */
@@ -87,7 +87,7 @@ export async function GET() {
     if (!data.item || data.currently_playing_type !== "track") return nothing(`now playing: ${data.currently_playing_type}`);
     const body = shape(data.item);
     return NextResponse.json(body, {
-      headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
+      headers: { "Cache-Control": "public, s-maxage=10, stale-while-revalidate=20" },
     });
   } catch (e) {
     return nothing(`error: ${e instanceof Error ? e.message : String(e)}`);

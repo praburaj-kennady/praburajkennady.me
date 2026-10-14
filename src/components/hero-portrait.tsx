@@ -15,16 +15,19 @@ import { PixelPortrait } from "@/components/pixel-art";
    again, with no song card. Under Reduce Motion he stays still.
 
    While he listens, a card beside him says what is playing on my
-   Spotify right now, from /api/now-playing, asked each time he starts
-   listening (the answer is cached 30s at the edge). It shows only while
-   a track is actually playing; otherwise there is just the song. The
-   card slides in once the notes are up, CARD_AT after he starts
+   Spotify right now, from /api/now-playing, asked when he starts
+   listening and every POLL_EVERY after (the answer is cached 10s at the
+   edge), so the card follows the song as it changes. It shows only
+   while a track is actually playing; otherwise there is just the song.
+   The card slides in once the notes are up, CARD_AT after he starts
    listening (or at once, if Spotify took longer than that to answer),
-   and slides out when he stops; it stays in the tree for the slide out
-   and goes when that ends. */
+   a new song slides in in its place, and it slides out when he stops or
+   the music does; it stays in the tree for the slide out and goes when
+   that ends. */
 const NUDGE = 4; // px of movement that counts as the mouse arriving
 const CARD_AT = 2400; // ms after he starts listening that the card arrives
 const CARD_OUT = 220; // ms the card takes to leave
+const POLL_EVERY = 10000; // ms between asking Spotify again while he listens
 const STILL_FOR = 4000; // ms he rests between songs, with no pointer
 const LISTEN_FOR = 7000; // ms a song lasts, with no pointer
 
@@ -94,15 +97,22 @@ export function HeroPortrait({ className }: { className?: string }) {
     let live = true;
     const got = (found: NowPlaying["track"]) => {
       if (!live) return;
-      setTrack(found);
+      // The same song again is the same card; a new one is a new card;
+      // the music stopping sends the card off.
+      if (!found && shown.current) setLeaving({ track: shown.current });
+      setTrack((was) => (was && found && was.url === found.url ? was : found));
       setDelay(Math.max(0, CARD_AT - (Date.now() - since)));
     };
-    fetch("/api/now-playing")
-      .then((r) => (r.ok ? (r.json() as Promise<NowPlaying>) : { track: null }))
-      .then((data) => got(data.track))
-      .catch(() => got(null));
+    const ask = () =>
+      fetch("/api/now-playing")
+        .then((r) => (r.ok ? (r.json() as Promise<NowPlaying>) : { track: null }))
+        .then((data) => got(data.track))
+        .catch(() => got(null));
+    ask();
+    const again = setInterval(ask, POLL_EVERY);
     return () => {
       live = false;
+      clearInterval(again);
     };
   }, [listening, hovers]);
 
@@ -130,6 +140,7 @@ export function HeroPortrait({ className }: { className?: string }) {
       />
       {card && up && (
         <a
+          key={up.url}
           className={`now-playing now-playing-${card}`}
           style={card === "in" ? { animationDelay: `${delay}ms` } : undefined}
           href={up.url}

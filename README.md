@@ -24,7 +24,7 @@ All site copy lives in `src/content/site.ts` — one file to edit when case-stud
 
 ## Now playing
 
-Move the mouse over the portrait and he listens to whatever is playing on my Spotify (or the last thing played). `src/app/api/now-playing/route.ts` asks Spotify, cached 30s at the edge; the portrait fetches it once per visit. It needs three secrets on the Vercel project, set up once, all from the browser:
+Move the mouse over the portrait and he listens to whatever is playing on my Spotify (or the last thing played). `src/app/api/now-playing/route.ts` asks Spotify, cached 10s at the edge; the portrait asks it every 10s while he listens, so the card follows the song. It needs three secrets on the Vercel project, set up once, all from the browser:
 
 1. Make an app at [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard). Under Redirect URIs add `https://<the site>/api/spotify/callback` (the deployment you'll do step 3 on). Copy its client ID and secret.
 2. In Vercel → Settings → Environment Variables, add `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET`, then redeploy.
