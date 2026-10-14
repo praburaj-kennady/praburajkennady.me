@@ -57,9 +57,21 @@ const EYES_SHUT = [
   "M165.712 119.962H188.587V131.4H165.712V119.962Z",
 ];
 
-const Eyes = ({ prefix }: { prefix: string }) => (
+/** One pixel of the 240-unit drawing, 21 pixels a side. */
+export const PIXEL = 240 / 21;
+
+/** Where he looks, in pixels of the drawing: -1, 0 or 1 each way. */
+export interface Look {
+  x: number;
+  y: number;
+}
+
+const Eyes = ({ prefix, look }: { prefix: string; look?: Look }) => (
   <>
-    <g className={`${prefix}eyes-open`}>
+    <g
+      className={`${prefix}eyes-open`}
+      style={look && (look.x || look.y) ? { transform: `translate(${look.x * PIXEL}px, ${look.y * PIXEL}px)` } : undefined}
+    >
       {EYES_OPEN.map((d) => (
         <path key={d} d={d} />
       ))}
@@ -90,7 +102,7 @@ export function PortraitMark(props: IconProps) {
   );
 }
 
-export function PixelPortrait(props: IconProps) {
+export function PixelPortrait({ look, ...props }: IconProps & { look?: Look }) {
   return (
     <svg viewBox="0 0 240 240" fill="currentColor" aria-hidden="true" focusable="false" overflow="visible" {...props}>
             {FIGURE.map((d) => (
@@ -98,7 +110,7 @@ export function PixelPortrait(props: IconProps) {
       ))}
 
       {/* The eyes, in their three frames (globals.css, .hero-art). */}
-      <Eyes prefix="" />
+      <Eyes prefix="" look={look} />
 
       {/* Two notes over his right ear and a third beside it; shown under the pointer. */}
       <g className="deco deco-note-a" transform="translate(168 -83.5)">
