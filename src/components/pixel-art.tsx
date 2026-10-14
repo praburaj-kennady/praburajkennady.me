@@ -59,9 +59,9 @@ const EYES_SHUT = [
 
 /** One pixel of the 240-unit drawing, 21 pixels a side. */
 export const PIXEL = 240 / 21;
-const LOOK_STEP = PIXEL / 3;
+const LOOK_STEP = PIXEL / 4;
 
-/** Where he looks: -1, 0 or 1 each way. The eyes move a third of a pixel of
+/** Where he looks: -1, 0 or 1 each way. The eyes move a quarter of a pixel of
     the drawing that way, so they never meet a neighbouring square and
     read as eyes all the while. */
 export interface Look {
