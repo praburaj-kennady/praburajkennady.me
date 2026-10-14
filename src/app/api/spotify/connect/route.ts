@@ -8,7 +8,9 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-const SCOPE = "user-read-currently-playing user-read-recently-played";
+/* Currently playing for the card; playback state so /api/now-playing
+   can say which devices Spotify sees when it reports nothing playing. */
+const SCOPE = "user-read-currently-playing user-read-playback-state user-read-recently-played";
 
 export function GET(request: NextRequest) {
   if (process.env.SPOTIFY_REFRESH_TOKEN) return new NextResponse(null, { status: 404 });

@@ -31,3 +31,5 @@ Move the mouse over the portrait and he listens to whatever is playing on my Spo
 3. Open `https://<the site>/api/spotify/connect`, allow the app in Spotify, and copy the `SPOTIFY_REFRESH_TOKEN` it shows into Vercel. Redeploy.
 
 Once the token is set, the connect and callback routes answer 404. Without the three, `/api/now-playing` answers `{ track: null }` and the portrait just listens.
+
+If the card stays away while a song is playing, open `/api/now-playing` by hand: its `reason` says which step came up empty. `now playing: 204` is Spotify saying it sees nothing playing. That happens in a Private Session, on another account, and, by a long-standing Spotify bug, from a client that has been running a while; quitting and relaunching the Spotify app and starting the song again clears it. With the playback-state permission (asked for at connect time) the reason also lists the devices Spotify sees.
