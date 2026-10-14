@@ -282,7 +282,8 @@
      its left edge 224px in from the portrait's (over the headphone's
      edge) and 16px down. Raised, 20px corners, the album art 56px with
      12px corners, then "Listening to" in Caption 2, the title in Title 2
-     and the artists in Caption 1. It takes no room in the layout. On a
+     and the first artist in Caption 1, each cut with an ellipsis to keep
+     the card within 240px. It takes no room in the layout. On a
      window too narrow for it beside the column it sits at the window's
      foot instead, centred. */
   .hero-art-wrap {
@@ -299,7 +300,7 @@
     align-items: center;
     gap: 8px;
     width: max-content;
-    max-width: min(321px, calc(100vw - 32px));
+    max-width: min(240px, calc(100vw - 32px));
     padding: 8px 12px 8px 8px;
     border-radius: 20px;
     background: var(--raised);
