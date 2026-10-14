@@ -57,24 +57,9 @@ const EYES_SHUT = [
   "M165.712 119.962H188.587V131.4H165.712V119.962Z",
 ];
 
-/** One pixel of the 240-unit drawing, 21 pixels a side. */
-export const PIXEL = 240 / 21;
-const LOOK_STEP = PIXEL / 4;
-
-/** Where he looks: -1, 0 or 1 each way. The eyes move a quarter of a pixel of
-    the drawing that way, so they never meet a neighbouring square and
-    read as eyes all the while. */
-export interface Look {
-  x: number;
-  y: number;
-}
-
-const Eyes = ({ prefix, look }: { prefix: string; look?: Look }) => (
+const Eyes = ({ prefix }: { prefix: string }) => (
   <>
-    <g
-      className={`${prefix}eyes-open`}
-      style={look && (look.x || look.y) ? { transform: `translate(${look.x * LOOK_STEP}px, ${look.y * LOOK_STEP}px)` } : undefined}
-    >
+    <g className={`${prefix}eyes-open`}>
       {EYES_OPEN.map((d) => (
         <path key={d} d={d} />
       ))}
@@ -105,7 +90,7 @@ export function PortraitMark(props: IconProps) {
   );
 }
 
-export function PixelPortrait({ look, ...props }: IconProps & { look?: Look }) {
+export function PixelPortrait(props: IconProps) {
   return (
     <svg viewBox="0 0 240 240" fill="currentColor" aria-hidden="true" focusable="false" overflow="visible" {...props}>
             {FIGURE.map((d) => (
@@ -113,7 +98,7 @@ export function PixelPortrait({ look, ...props }: IconProps & { look?: Look }) {
       ))}
 
       {/* The eyes, in their three frames (globals.css, .hero-art). */}
-      <Eyes prefix="" look={look} />
+      <Eyes prefix="" />
 
       {/* Two notes over his right ear and a third beside it; shown under the pointer. */}
       <g className="deco deco-note-a" transform="translate(168 -83.5)">
