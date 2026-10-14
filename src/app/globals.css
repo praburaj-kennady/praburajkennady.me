@@ -172,6 +172,15 @@
     padding-bottom: 16px;
     border-bottom: 1px solid var(--line);
     view-transition-name: site-header;
+    /* It stays at the top as the page scrolls under it, on the page's
+       ground. It takes the page's top padding as its own, pulled up by
+       as much, so nothing shows above it. */
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--base);
+    margin-top: calc(-1 * max(28px, env(safe-area-inset-top)));
+    padding-top: max(28px, env(safe-area-inset-top));
   }
   .logo {
     display: block;
