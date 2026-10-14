@@ -9,8 +9,9 @@ export const profile = {
   name: "praburaj kennady",
   /** The home page's heading, for screen readers; it is not shown. */
   fullName: "Praburaj Kennady",
+  /** The first line, broken where the Figma frame breaks it. */
   tagline:
-    "Praburaj Kennady, product builder shipping initiative ideas into usable products with AI.",
+    "Praburaj Kennady, Product Designer & Builder\nshipping initiative ideas into usable products with AI.",
   taglineDetail:
     "Currently working at Zoho with 6 years of experience across enterprise and consumer products, on iOS, Android, and TV.",
   email: "hello@praburajkennady.me",

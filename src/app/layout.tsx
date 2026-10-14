@@ -22,7 +22,7 @@ const nunito = localFont({
 
 export const metadata: Metadata = {
   title: "Praburaj Kennady — Product Designer",
-  description: `${profile.tagline} ${profile.taglineDetail}`,
+  description: `${profile.tagline.replace("\n", " ")} ${profile.taglineDetail}`,
 };
 
 /* On phones: the browser's own toolbars take the page colour (the --base

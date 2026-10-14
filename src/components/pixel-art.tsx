@@ -14,9 +14,9 @@ type IconProps = SVGProps<SVGSVGElement>;
     notes, heart and sparkles are from the same Figma frame; they sit
     outside the drawing's 240 × 240 box and take no room. It moves as
     pixel art does, a frame at a time; the steps are in globals.css. */
-/** The figure in headphones, less his eyes: 22 paths on a 240 × 240
-    grid of 21 pixels a side. PixelPortrait adds the eyes in their frames;
-    PortraitMark adds them open. */
+/** The figure in headphones as the Figma Logo component's Light variant
+    draws him, less his eyes: 22 paths on a 240 × 240 grid of 21 pixels a
+    side. Figure adds the eyes in their frames. */
 const FIGURE = [
   "M222.862 97.1625H234.262V142.838H222.862V97.1625Z",
   "M74.2875 97.1625H85.6875V85.6875H97.1625V74.2875H142.837V85.6875H154.312V74.2875H188.587V85.6875H199.987V177.113H211.462V154.313H222.862V142.838H211.462V97.1625H222.862V85.6875H211.462V40.0125H199.987V51.4125H188.587V40.0125H165.712V28.5375H85.6875V40.0125H74.2875V51.4125H62.8875V74.2875H51.4125V40.0125H40.0125V74.2875H28.6125V85.6875H74.2875V97.1625Z",
@@ -57,22 +57,71 @@ const EYES_SHUT = [
   "M165.712 119.962H188.587V131.4H165.712V119.962Z",
 ];
 
-const Eyes = ({ prefix }: { prefix: string }) => (
+/* The same figure as the Figma Logo component's Dark variant draws him:
+   his outline filled, his features cut out of it, on a 44-unit grid of
+   about 1.92 a pixel. It is scaled up to the 240 box. */
+const DARK_SCALE = 240 / 44;
+const DARK_FIGURE = [
+  "M29.7053 35.4757L29.6991 39.322H22.0063V37.4079H18.1541V35.4757H29.7053Z",
+  "M34.3748 1.92297H36.3072V3.84253H38.2271V5.77554H40.1594V13.4663H42.0802V15.3993H44V28.6012H42.0802V30.5342H40.1594V34.3733H38.2271V36.5728H42.0802V44.0034H5.77295V36.5728H9.62517V32.4538H3.85222V30.5333H1.91983V28.6012H0V15.3993H1.91983V13.4663H3.85222V11.5468H5.77295V5.77554H7.69278V3.84343L9.62517 3.84253V1.92297H11.545V0.00341797H34.3748V1.92297ZM16.2208 37.4079H12.3811V39.3283H8.52889V41.2479H39.3242V39.3283H35.4711V37.4079H31.6189V35.4757H33.5513V33.5562L16.2208 33.5499V37.4079ZM14.3009 31.6178V33.5499H16.2208V31.6178H14.3009ZM33.5513 31.6178V33.5499H35.4711V31.6178H33.5513ZM6.60816 27.7787V29.6982H12.3811V31.6178H14.3009V27.7778L6.60816 27.7787ZM25.8459 29.6982V31.6178H31.6189V29.6982H25.8459ZM16.2208 6.59808V8.53109H14.3009V10.4506H12.3811V14.3023H10.4487V8.53109H8.52889V14.3023H6.60816V16.2219H14.3009V18.1549H16.2208V16.2219H18.1541V14.3023H25.8459V16.2219H27.7783V14.3023H33.5513V16.2219H35.4711V31.6178H37.4035V27.7787H39.3242V25.8457H37.4035V18.1549H39.3242V16.2219H37.4035V8.53109H35.4711V10.4506H33.5513V8.53109H29.6991V6.59808H16.2208ZM23.9261 27.7787V29.6982H25.8459V27.7787H23.9261ZM31.6189 27.7787V29.6982H33.5513V27.7787H31.6189ZM4.67577 25.8457V27.7778L6.60816 27.7787V25.8457H4.67577ZM14.3009 25.8457V27.7778H16.2208V25.8457H14.3009ZM2.75594 18.1549V25.8457H4.67577V18.154L2.75594 18.1549ZM16.2208 18.1549V25.8457H18.1541V18.1549H16.2208ZM22.0063 21.994V25.8457H23.9261V21.994H22.0063ZM31.6189 21.994V25.8457H33.5513V21.994H31.6189ZM39.3242 18.1549V25.8457H41.2441V18.1549H39.3242ZM6.60816 20.0744V23.9261H8.52889V20.0744H6.60816ZM8.52889 18.1549V20.0744H10.4487V18.1549H8.52889ZM4.67577 16.2219V18.154H6.60816V16.2219H4.67577ZM22.0063 16.2219V18.154H25.8459V16.2219H22.0063ZM10.4487 6.59808V8.53109H12.3811V6.59808H10.4487ZM33.5513 6.59808V8.53109H35.4711V6.59808H33.5513ZM12.3811 4.67852V6.59808H14.3009V4.67852H12.3811ZM31.6189 4.67852V6.59808H33.5513V4.67852H31.6189ZM14.3009 2.75897V4.67852H31.6189V2.75897H14.3009Z",
+];
+/* In the dark drawing his eyes are two holes, two pixels tall, at
+   x 22.0–23.9 and 31.6–33.6, y 22.0–25.8. The frames cover them: half
+   shut fills the lower pixel of each; shut fills both and cuts the lid's
+   line, in the ground colour, running in towards the nose. The covers
+   overlap the holes' edges by a tenth of a unit, so no seam shows
+   between their edge and the hole's. */
+const DARK_EYE_HOLES = [
+  "M21.9063 21.894H24.0261V25.9457H21.9063V21.894Z",
+  "M31.5189 21.894H33.6513V25.9457H31.5189V21.894Z",
+];
+const DARK_EYES_LOWER = [
+  "M21.9063 23.8261H24.0261V25.9457H21.9063V23.8261Z",
+  "M31.5189 23.8261H33.6513V25.9457H31.5189V23.8261Z",
+];
+const DARK_EYES_LID = [
+  "M22.0063 21.994H25.8459V23.9261H22.0063V21.994Z",
+  "M29.6991 21.994H33.5513V23.9261H29.6991V21.994Z",
+];
+
+const Paths = ({ paths }: { paths: string[] }) => (
   <>
-    <g className={`${prefix}eyes-open`}>
-      {EYES_OPEN.map((d) => (
-        <path key={d} d={d} />
-      ))}
+    {paths.map((d) => (
+      <path key={d} d={d} />
+    ))}
+  </>
+);
+
+/** The figure in both drawings, each with his eyes in their three
+    frames (prefix + eyes-open, eyes-half, eyes-shut). The light drawing
+    shows by day and the dark one by night (globals.css, --figure-light
+    and --figure-dark), so both carry the same frame classes and the one
+    on show takes whatever the frames do. */
+const Figure = ({ prefix }: { prefix: string }) => (
+  <>
+    <g className="figure-light">
+      <Paths paths={FIGURE} />
+      <g className={`${prefix}eyes-open`}>
+        <Paths paths={EYES_OPEN} />
+      </g>
+      <g className={`${prefix}eyes-half`}>
+        <Paths paths={EYES_HALF} />
+      </g>
+      <g className={`${prefix}eyes-shut`}>
+        <Paths paths={EYES_SHUT} />
+      </g>
     </g>
-    <g className={`${prefix}eyes-half`}>
-      {EYES_HALF.map((d) => (
-        <path key={d} d={d} />
-      ))}
-    </g>
-    <g className={`${prefix}eyes-shut`}>
-      {EYES_SHUT.map((d) => (
-        <path key={d} d={d} />
-      ))}
+    <g className="figure-dark" transform={`scale(${DARK_SCALE})`}>
+      <Paths paths={DARK_FIGURE} />
+      <g className={`${prefix}eyes-half`}>
+        <Paths paths={DARK_EYES_LOWER} />
+      </g>
+      <g className={`${prefix}eyes-shut`}>
+        <Paths paths={DARK_EYE_HOLES} />
+        <g className="figure-ground">
+          <Paths paths={DARK_EYES_LID} />
+        </g>
+      </g>
     </g>
   </>
 );
@@ -82,10 +131,7 @@ const Eyes = ({ prefix }: { prefix: string }) => (
 export function PortraitMark(props: IconProps) {
   return (
     <svg viewBox="0 0 240 240" fill="currentColor" aria-hidden="true" focusable="false" {...props}>
-      {FIGURE.map((d) => (
-        <path key={d} d={d} />
-      ))}
-      <Eyes prefix="mark-" />
+      <Figure prefix="mark-" />
     </svg>
   );
 }
@@ -93,15 +139,11 @@ export function PortraitMark(props: IconProps) {
 export function PixelPortrait(props: IconProps) {
   return (
     <svg viewBox="0 0 240 240" fill="currentColor" aria-hidden="true" focusable="false" overflow="visible" {...props}>
-            {FIGURE.map((d) => (
-        <path key={d} d={d} />
-      ))}
-
-      {/* The eyes, in their three frames (globals.css, .hero-art). */}
-      <Eyes prefix="" />
+      {/* The figure, his eyes in their three frames (globals.css, .hero-art). */}
+      <Figure prefix="" />
 
       {/* Two notes over his right ear and a third beside it; shown under the pointer. */}
-      <g className="deco deco-note-a" transform="translate(168 -83.5)">
+      <g className="deco deco-note-a" transform="translate(178 -83.5)">
         <g className="note note-a">
           <path d="M29.8027 0H37.2594V3.70722H29.8027V0Z" />
           <path d="M29.8026 22.1706V25.8536H26.0864V33.2438H29.8026V36.9268H37.2594V33.2438H41V3.70721H37.2594V22.1706H29.8026Z" />
@@ -110,14 +152,14 @@ export function PixelPortrait(props: IconProps) {
           <path d="M3.74061 48H11.1974V44.317H14.9135V11.0732H11.1974V33.2438H3.74061V36.9268H0V44.317H3.74061V48Z" />
         </g>
       </g>
-      <g className="deco deco-note-b" transform="translate(239 -69.5)">
+      <g className="deco deco-note-b" transform="translate(249 -69.5)">
         <g className="note note-b">
           <path d="M21.4352 10.9069H25V18.1861H21.4352V10.9069Z" />
           <path d="M17.8706 7.27924H21.4353V10.9069H17.8706V7.27924Z" />
           <path d="M14.2824 3.62769V0H10.7177V25.4654H3.56474V29.0931H0V36.3723H3.56474V40H10.7177V36.3723H14.2824V7.27924H17.8706V3.62769H14.2824Z" />
         </g>
       </g>
-      <g className="deco deco-note-c" transform="translate(204 -19.5)">
+      <g className="deco deco-note-c" transform="translate(214 -19.5)">
         <g className="note note-c">
           <path d="M17.1482 8.72552H20V14.5489H17.1482V8.72552Z" />
           <path d="M14.2965 5.82339H17.1483V8.72554H14.2965V5.82339Z" />
