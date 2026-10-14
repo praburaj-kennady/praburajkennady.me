@@ -20,7 +20,7 @@ export const profile = {
 /** The pages, in the nav's order, with the line that opens each. */
 export const pages = {
   work: {
-    title: "Work",
+    title: "Works",
     lede: "What I've shipped, what's in progress, and what I make for the craft of it.",
   },
   experience: {
@@ -63,6 +63,9 @@ export interface Project {
   blurb: string;
   meta: string; // "company · period" line
   tags: Tag[];
+  /** Kept off the Work page for now: the Figma frame shows only the
+      projects without it. Delete the line to list it again. */
+  hidden?: true;
 }
 
 export const projects: Project[] = [
@@ -76,6 +79,7 @@ export const projects: Project[] = [
   },
   {
     slug: "collector",
+    hidden: true,
     title: "Collector",
     blurb:
       "Multi-vendor food-court ordering — scan a table QR, order from every stall in one cart, pay once. Design system, flows and sticker-collecting gamification, in progress.",
@@ -84,6 +88,7 @@ export const projects: Project[] = [
   },
   {
     slug: "zero-to-mvp",
+    hidden: true,
     title: "Zero to MVP, in a month",
     blurb:
       "A one-month freelance engagement for a US startup — took a founder's idea to a shipped MVP, end to end.",
@@ -92,6 +97,7 @@ export const projects: Project[] = [
   },
   {
     slug: "zwap",
+    hidden: true,
     title: "Zwap",
     blurb:
       "Currency, units and time zones in one playful, primary-palette iOS app. Designed in Figma, built by directing Claude — headed for the App Store.",

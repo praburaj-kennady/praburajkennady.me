@@ -283,25 +283,74 @@
     margin: 0 0 24px;
   }
 
-  /* A raised panel, for the things a page wants to stand out. */
-  .card {
-    background: var(--raised);
-    border-radius: 24px;
-    padding: 18px 22px;
-    margin: 24px 0;
+  /* The Work page, from the Figma frame. Under the heading, 6px down,
+     the line that opens it in Reading; 28px under that, the projects. */
+  .intro {
+    margin: 0;
   }
-  .card h2 {
+  /* The projects take the room left in the window, so the footer sits at
+     its foot, as in the frame; a longer list pushes it down. */
+  .page-fill {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .page-fill main {
+    flex: 1;
+  }
+  .projects {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 28px;
+  }
+  /* The Project card: on the raised grey, 24px corners, 20px by 22px of
+     padding, 12px between its title, its line and its tags. The title in
+     Title 1 with where and when 4px under it in Callout, --muted. */
+  .project {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 22px;
+    border-radius: 24px;
+    background: var(--raised);
+  }
+  .project h2 {
+    margin: 0 0 4px;
     font-size: 1.375rem; /* 22px, Title 1 */
     line-height: 1.75rem;
     letter-spacing: -0.2px;
     font-weight: 700;
-    margin: 0 0 4px;
   }
-  .card .meta {
-    margin: 0 0 8px;
+  .project p {
+    margin: 0;
   }
-  .card > :last-child {
-    margin-bottom: 0;
+  .project .project-meta {
+    color: var(--muted);
+    font-size: 0.9375rem; /* 15px, Callout */
+    line-height: 1.25rem;
+    font-weight: 600;
+  }
+  /* The Tag: a pill on the page's ground, Caption 1 in --text-2, 6px
+     apart, wrapping. */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .tags li {
+    margin: 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--base);
+    font-size: 0.75rem; /* 12px, Caption 1 */
+    line-height: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
   }
 
   /* The home page fills the window. Its hero stands in the middle of the
