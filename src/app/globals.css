@@ -399,8 +399,9 @@
      is: every change is a cut to the next frame (step-end), never a
      tween, and nothing hurries.
      - Eyes: a blink first (open, half, shut, half, open, in a quarter
-       of a second), a short pause, then they close (half, shut) and stay
-       shut while the pointer stays. 1.4s in all.
+       of a second), a glance to his left, then his right, then back, as
+       if to see who's there, then they close (half, shut) and stay shut
+       while the pointer stays. 2.4s in all.
      - The notes, heart and sparkles come in one after another over the
        first few seconds (appear, each for its own length), not all at
        once: the small note first, then the big one, then the pair; the
@@ -421,34 +422,34 @@
   }
   @media (prefers-reduced-motion: no-preference) {
     .hero-art[data-listening] .eyes-open {
-      animation: eyes-open 1.4s step-end forwards;
+      animation: eyes-open 2.4s step-end forwards;
     }
     .hero-art[data-listening] .eyes-half {
-      animation: eyes-half 1.4s step-end forwards;
+      animation: eyes-half 2.4s step-end forwards;
     }
     .hero-art[data-listening] .eyes-shut {
-      animation: eyes-shut 1.4s step-end forwards;
+      animation: eyes-shut 2.4s step-end forwards;
     }
     .hero-art[data-listening] .deco {
       animation: appear 1s linear forwards;
     }
     .hero-art[data-listening] .deco-note-c {
-      animation-duration: 1.2s;
+      animation-duration: 2.4s;
     }
     .hero-art[data-listening] .deco-heart {
-      animation-duration: 1.8s;
+      animation-duration: 3s;
     }
     .hero-art[data-listening] .deco-note-b {
-      animation-duration: 2.2s;
+      animation-duration: 3.4s;
     }
     .hero-art[data-listening] .deco-sparkle-a {
-      animation-duration: 2.8s;
+      animation-duration: 4s;
     }
     .hero-art[data-listening] .deco-note-a {
-      animation-duration: 3.2s;
+      animation-duration: 4.4s;
     }
     .hero-art[data-listening] .deco-sparkle-b {
-      animation-duration: 3.8s;
+      animation-duration: 5s;
     }
     /* The card is a piece of the page, not of the pixel art: it rises
        into place and sinks away, on the Zwap ease. The delay is set
@@ -464,13 +465,13 @@
       animation: note-rise 3.6s step-end infinite both;
     }
     .hero-art[data-listening] .note-c {
-      animation-delay: 1.2s;
+      animation-delay: 2.4s;
     }
     .hero-art[data-listening] .note-b {
-      animation-delay: 2.2s;
+      animation-delay: 3.4s;
     }
     .hero-art[data-listening] .note-a {
-      animation-delay: 3.2s;
+      animation-delay: 4.4s;
     }
     .hero-art[data-listening] .heart {
       animation: heart-beat 2.4s step-end infinite;
@@ -723,34 +724,33 @@
 }
 
 /* The portrait's frames (see .hero-art). */
-/* 1.4s: a blink in the first 20% (open 0–4, half 4–9, shut 9–15, half
-   15–20), open until 50%, then half 50–60 and shut from 60 on. */
+/* 2.4s. A blink in the first 8% (open, half 2–4, shut 4–6, half 6–8),
+   open and centred to 25%, a glance left (half a pixel) to 46%, right to
+   67%, centred to 79%, half shut to 85%, shut from there. The glance is
+   a transform on the open eyes alone; the shut eyes stay put. */
 @keyframes eyes-open {
-  0% { opacity: 1; }
-  4% { opacity: 0; }
-  20% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  0% { opacity: 1; transform: translateX(0); }
+  2% { opacity: 0; }
+  8% { opacity: 1; }
+  25% { transform: translateX(-5.7px); }
+  46% { transform: translateX(5.7px); }
+  67% { transform: translateX(0); }
+  79%, 100% { opacity: 0; }
 }
 @keyframes eyes-half {
   0% { opacity: 0; }
-  4% { opacity: 1; }
-  9% { opacity: 0; }
-  15% { opacity: 1; }
-  20% { opacity: 0; }
-  50% { opacity: 1; }
-  60%, 100% { opacity: 0; }
+  2% { opacity: 1; }
+  4% { opacity: 0; }
+  6% { opacity: 1; }
+  8% { opacity: 0; }
+  79% { opacity: 1; }
+  85%, 100% { opacity: 0; }
 }
 @keyframes eyes-shut {
   0% { opacity: 0; }
-  9% { opacity: 1; }
-  15% { opacity: 0; }
-  60%, 100% { opacity: 1; }
-}
-/* Hidden until the end, then shown: a cut, with the shown state as the
-   last keyframe so it holds. Each thing runs it for its own length. */
-@keyframes appear {
-  0%, 99.9% { opacity: 0; }
-  100% { opacity: 1; }
+  4% { opacity: 1; }
+  6% { opacity: 0; }
+  85%, 100% { opacity: 1; }
 }
 /* The header mark's blink: 2.4s a loop, the blink in its first 12%. */
 @keyframes mark-eyes-open {

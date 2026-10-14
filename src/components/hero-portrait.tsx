@@ -23,10 +23,10 @@ import { PixelPortrait } from "@/components/pixel-art";
    and slides out when he stops; it stays in the tree for the slide out
    and goes when that ends. */
 const NUDGE = 4; // px of movement that counts as the mouse arriving
-const CARD_AT = 3200; // ms after he starts listening that the card arrives
+const CARD_AT = 4400; // ms after he starts listening that the card arrives
 const CARD_OUT = 220; // ms the card takes to leave
 const STILL_FOR = 4000; // ms he rests between songs, with no pointer
-const LISTEN_FOR = 7000; // ms a song lasts, with no pointer
+const LISTEN_FOR = 9000; // ms a song lasts, with no pointer
 
 export function HeroPortrait({ className }: { className?: string }) {
   const [listening, setListening] = useState(false);
