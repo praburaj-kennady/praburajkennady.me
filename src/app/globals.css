@@ -754,6 +754,12 @@
   5% { opacity: 1; }
   9%, 100% { opacity: 0; }
 }
+/* Hidden until the end, then shown: a cut, with the shown state as the
+   last keyframe so it holds. Each thing runs it for its own length. */
+@keyframes appear {
+  0%, 99.9% { opacity: 0; }
+  100% { opacity: 1; }
+}
 /* The song card's arrival and leaving. `translate` keeps clear of the
    transform that centres it on a phone. */
 @keyframes card-in {
