@@ -57,19 +57,19 @@ const EYES_SHUT = [
   "M165.712 119.962H188.587V131.4H165.712V119.962Z",
 ];
 
-const Eyes = ({ prefix }: { prefix: string }) => (
+const Eyes = () => (
   <>
-    <g className={`${prefix}eyes-open`}>
+    <g className="eyes-open">
       {EYES_OPEN.map((d) => (
         <path key={d} d={d} />
       ))}
     </g>
-    <g className={`${prefix}eyes-half`}>
+    <g className="eyes-half">
       {EYES_HALF.map((d) => (
         <path key={d} d={d} />
       ))}
     </g>
-    <g className={`${prefix}eyes-shut`}>
+    <g className="eyes-shut">
       {EYES_SHUT.map((d) => (
         <path key={d} d={d} />
       ))}
@@ -77,15 +77,16 @@ const Eyes = ({ prefix }: { prefix: string }) => (
   </>
 );
 
-/** The figure for the header's mark: still, eyes open, and he blinks
-    under the pointer (globals.css, .logo). */
+/** The figure for the header's mark: still, eyes open. */
 export function PortraitMark(props: IconProps) {
   return (
     <svg viewBox="0 0 240 240" fill="currentColor" aria-hidden="true" focusable="false" {...props}>
       {FIGURE.map((d) => (
         <path key={d} d={d} />
       ))}
-      <Eyes prefix="mark-" />
+      {EYES_OPEN.map((d) => (
+        <path key={d} d={d} />
+      ))}
     </svg>
   );
 }
@@ -98,7 +99,7 @@ export function PixelPortrait(props: IconProps) {
       ))}
 
       {/* The eyes, in their three frames (globals.css, .hero-art). */}
-      <Eyes prefix="" />
+      <Eyes />
 
       {/* Two notes over his right ear and a third beside it; shown under the pointer. */}
       <g className="deco deco-note-a" transform="translate(168 -83.5)">
