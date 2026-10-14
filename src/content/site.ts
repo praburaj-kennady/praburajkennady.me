@@ -30,10 +30,9 @@ export const pages = {
 
 /** The footer's credit: "<site>, designed by <name>." with the name
     linking home. */
-/** The home page's pills, in order. "More about me" goes to Experience. */
+/** The home page's pills, in order: Works, then Resume. */
 export const homeLinks = {
-  work: "Work",
-  about: "More about me",
+  work: "Works",
   resume: "Resume",
 };
 
