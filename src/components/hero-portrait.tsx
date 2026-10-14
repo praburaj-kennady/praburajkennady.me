@@ -8,8 +8,11 @@ import { PixelPortrait } from "@/components/pixel-art";
    A browser reports a pointer over the picture as soon as the page
    loads if the cursor happens to rest there, so :hover and pointerenter
    would start the song on their own. Instead he listens only once a
-   mouse has moved a few pixels over him, and stops when it leaves. On a
-   touch screen a tap starts the song, and the next tap stops it.
+   mouse has moved a few pixels over him, and stops when it leaves.
+
+   On a screen with nothing to hover with (a phone, a tablet) he plays
+   by himself: still for a while, then listening for a while, and round
+   again, with no song card. Under Reduce Motion he stays still.
 
    While he listens, a card beside him says what is playing on my
    Spotify right now, from /api/now-playing, asked each time he starts
@@ -22,11 +25,15 @@ import { PixelPortrait } from "@/components/pixel-art";
 const NUDGE = 4; // px of movement that counts as the mouse arriving
 const CARD_AT = 2400; // ms after he starts listening that the card arrives
 const CARD_OUT = 220; // ms the card takes to leave
+const STILL_FOR = 4000; // ms he rests between songs, with no pointer
+const LISTEN_FOR = 7000; // ms a song lasts, with no pointer
 
 export function HeroPortrait({ className }: { className?: string }) {
   const [listening, setListening] = useState(false);
   const [track, setTrack] = useState<NowPlaying["track"]>(null);
   const [card, setCard] = useState<"in" | "out" | null>(null);
+  // True where there is a pointer to hover with; false on a phone.
+  const [hovers, setHovers] = useState(true);
   const from = useRef<{ x: number; y: number } | null>(null);
   const since = useRef(0); // when he started listening
 
@@ -36,8 +43,34 @@ export function HeroPortrait({ className }: { className?: string }) {
     return () => window.removeEventListener("blur", stop);
   }, []);
 
+  // With nothing to hover with, he takes turns resting and listening.
   useEffect(() => {
-    if (!listening) return;
+    const canHover = window.matchMedia("(hover: hover)");
+    const stillness = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let timer = 0;
+    let on = false;
+    const turn = () => {
+      on = !on && !stillness.matches;
+      setListening(on);
+      timer = window.setTimeout(turn, on ? LISTEN_FOR : STILL_FOR);
+    };
+    const start = () => {
+      setHovers(canHover.matches);
+      clearTimeout(timer);
+      on = false;
+      setListening(false);
+      if (!canHover.matches) timer = window.setTimeout(turn, STILL_FOR);
+    };
+    start();
+    canHover.addEventListener("change", start);
+    return () => {
+      canHover.removeEventListener("change", start);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!listening || !hovers) return;
     since.current = Date.now();
     let live = true;
     fetch("/api/now-playing")
@@ -51,7 +84,7 @@ export function HeroPortrait({ className }: { className?: string }) {
 
   // The card comes while he listens to a playing track, and leaves when
   // either stops.
-  const wanted = listening && !!track;
+  const wanted = hovers && listening && !!track;
   useEffect(() => {
     if (wanted) {
       setCard("in");
@@ -79,9 +112,6 @@ export function HeroPortrait({ className }: { className?: string }) {
           if (e.pointerType !== "mouse") return;
           from.current = null;
           setListening(false);
-        }}
-        onPointerDown={(e) => {
-          if (e.pointerType !== "mouse") setListening((on) => !on);
         }}
       />
       {card && track && (

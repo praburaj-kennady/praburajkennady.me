@@ -185,6 +185,24 @@
     width: 100%;
     height: 100%;
   }
+  /* Under the pointer the mark blinks, as pixel art does, in cuts: open,
+     half, shut, half, open in about a quarter of a second, then a pause,
+     every 2.4s while the pointer stays. */
+  .logo .mark-eyes-half,
+  .logo .mark-eyes-shut {
+    opacity: 0;
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .logo:hover .mark-eyes-open {
+      animation: mark-eyes-open 2.4s step-end infinite;
+    }
+    .logo:hover .mark-eyes-half {
+      animation: mark-eyes-half 2.4s step-end infinite;
+    }
+    .logo:hover .mark-eyes-shut {
+      animation: mark-eyes-shut 2.4s step-end infinite;
+    }
+  }
   /* The nav's links are Title 2, in the text colour, --text-2 under the
      pointer; the one that is a button (Resume, until it exists) looks the
      same. 24px apart, 8px of padding above and below. */
@@ -713,6 +731,24 @@
 @keyframes appear {
   0%, 99.9% { opacity: 0; }
   100% { opacity: 1; }
+}
+/* The header mark's blink: 2.4s a loop, the blink in its first 12%. */
+@keyframes mark-eyes-open {
+  0% { opacity: 1; }
+  2% { opacity: 0; }
+  12%, 100% { opacity: 1; }
+}
+@keyframes mark-eyes-half {
+  0% { opacity: 0; }
+  2% { opacity: 1; }
+  5% { opacity: 0; }
+  9% { opacity: 1; }
+  12%, 100% { opacity: 0; }
+}
+@keyframes mark-eyes-shut {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  9%, 100% { opacity: 0; }
 }
 /* The song card's arrival and leaving. `translate` keeps clear of the
    transform that centres it on a phone. */

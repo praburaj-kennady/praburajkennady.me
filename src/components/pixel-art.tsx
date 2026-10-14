@@ -41,21 +41,51 @@ const FIGURE = [
   "M17.1375 85.6875H28.6125V97.1625H17.1375V85.6875Z",
   "M5.73749 97.1625H17.1375V142.838H5.73749V97.1625Z",
 ];
+/* His eyes in three frames: open, two pixels tall; half shut, the upper
+   pixel; shut, a line two pixels wide at the lid, running in towards the
+   nose. */
 const EYES_OPEN = [
   "M120.037 119.962H131.437V142.837H120.037V119.962Z",
   "M177.112 119.962H188.587V142.837H177.112V119.962Z",
 ];
+const EYES_HALF = [
+  "M120.037 119.962H131.437V131.4H120.037V119.962Z",
+  "M177.112 119.962H188.587V131.4H177.112V119.962Z",
+];
+const EYES_SHUT = [
+  "M120.037 119.962H142.837V131.4H120.037V119.962Z",
+  "M165.712 119.962H188.587V131.4H165.712V119.962Z",
+];
 
-/** The figure, still, with his eyes open: the header's mark. */
+const Eyes = ({ prefix }: { prefix: string }) => (
+  <>
+    <g className={`${prefix}eyes-open`}>
+      {EYES_OPEN.map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </g>
+    <g className={`${prefix}eyes-half`}>
+      {EYES_HALF.map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </g>
+    <g className={`${prefix}eyes-shut`}>
+      {EYES_SHUT.map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </g>
+  </>
+);
+
+/** The figure for the header's mark: still, eyes open, and he blinks
+    under the pointer (globals.css, .logo). */
 export function PortraitMark(props: IconProps) {
   return (
     <svg viewBox="0 0 240 240" fill="currentColor" aria-hidden="true" focusable="false" {...props}>
       {FIGURE.map((d) => (
         <path key={d} d={d} />
       ))}
-      {EYES_OPEN.map((d) => (
-        <path key={d} d={d} />
-      ))}
+      <Eyes prefix="mark-" />
     </svg>
   );
 }
@@ -67,22 +97,8 @@ export function PixelPortrait(props: IconProps) {
         <path key={d} d={d} />
       ))}
 
-      {/* The eyes, in three frames: open, two pixels tall; half shut, the
-          upper pixel; shut, a line two pixels wide at the lid, running in
-          towards the nose. */}
-      <g className="eyes-open">
-        {EYES_OPEN.map((d) => (
-          <path key={d} d={d} />
-        ))}
-      </g>
-      <g className="eyes-half">
-        <path d="M120.037 119.962H131.437V131.4H120.037V119.962Z" />
-        <path d="M177.112 119.962H188.587V131.4H177.112V119.962Z" />
-      </g>
-      <g className="eyes-shut">
-        <path d="M120.037 119.962H142.837V131.4H120.037V119.962Z" />
-        <path d="M165.712 119.962H188.587V131.4H165.712V119.962Z" />
-      </g>
+      {/* The eyes, in their three frames (globals.css, .hero-art). */}
+      <Eyes prefix="" />
 
       {/* Two notes over his right ear and a third beside it; shown under the pointer. */}
       <g className="deco deco-note-a" transform="translate(168 -83.5)">
