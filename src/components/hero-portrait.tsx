@@ -14,13 +14,21 @@ import { PixelPortrait } from "@/components/pixel-art";
    While he listens, a card beside him says what is playing on my
    Spotify right now, from /api/now-playing, asked each time he starts
    listening (the answer is cached 30s at the edge). It shows only while
-   a track is actually playing; otherwise there is just the song. */
+   a track is actually playing; otherwise there is just the song. The
+   card slides in once the notes are up, CARD_AT after he starts
+   listening (or at once, if Spotify took longer than that to answer),
+   and slides out when he stops; it stays in the tree for the slide out
+   and goes when that ends. */
 const NUDGE = 4; // px of movement that counts as the mouse arriving
+const CARD_AT = 2400; // ms after he starts listening that the card arrives
+const CARD_OUT = 220; // ms the card takes to leave
 
 export function HeroPortrait({ className }: { className?: string }) {
   const [listening, setListening] = useState(false);
   const [track, setTrack] = useState<NowPlaying["track"]>(null);
+  const [card, setCard] = useState<"in" | "out" | null>(null);
   const from = useRef<{ x: number; y: number } | null>(null);
+  const since = useRef(0); // when he started listening
 
   useEffect(() => {
     const stop = () => setListening(false);
@@ -30,6 +38,7 @@ export function HeroPortrait({ className }: { className?: string }) {
 
   useEffect(() => {
     if (!listening) return;
+    since.current = Date.now();
     let live = true;
     fetch("/api/now-playing")
       .then((r) => (r.ok ? (r.json() as Promise<NowPlaying>) : { track: null }))
@@ -39,6 +48,19 @@ export function HeroPortrait({ className }: { className?: string }) {
       live = false;
     };
   }, [listening]);
+
+  // The card comes while he listens to a playing track, and leaves when
+  // either stops.
+  const wanted = listening && !!track;
+  useEffect(() => {
+    if (wanted) {
+      setCard("in");
+      return;
+    }
+    setCard((state) => (state === "in" ? "out" : state));
+    const gone = setTimeout(() => setCard(null), CARD_OUT);
+    return () => clearTimeout(gone);
+  }, [wanted]);
 
   return (
     <div className="hero-art-wrap">
@@ -62,8 +84,14 @@ export function HeroPortrait({ className }: { className?: string }) {
           if (e.pointerType !== "mouse") setListening((on) => !on);
         }}
       />
-      {listening && track && (
-        <a className="now-playing" href={track.url} target="_blank" rel="noopener noreferrer">
+      {card && track && (
+        <a
+          className={`now-playing now-playing-${card}`}
+          style={card === "in" ? { animationDelay: `${Math.max(0, CARD_AT - (Date.now() - since.current))}ms` } : undefined}
+          href={track.url}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {track.art ? (
             // Spotify's CDN, a different URL per album: no next/image.
             // eslint-disable-next-line @next/next/no-img-element
