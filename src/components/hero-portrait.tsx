@@ -10,10 +10,11 @@ import { PixelPortrait, type Look } from "@/components/pixel-art";
    would start the song on their own. Instead he listens only once a
    mouse has moved a few pixels over him, and stops when it leaves.
 
-   His eyes follow the mouse about the page, a pixel at a time: one
-   pixel left or right once it is more than LOOK_AT away from his face
-   on that axis, one pixel up or down the same way, cut rather than
-   slid, as pixel art moves. They close while he listens.
+   His eyes follow the mouse about the page, half a pixel at a time:
+   that much left or right once it is more than LOOK_AT away from his
+   face on that axis, and up or down the same way, cut rather than slid,
+   as pixel art moves, and never far enough to touch another square.
+   They close while he listens.
 
    On a screen with nothing to hover with (a phone, a tablet) he plays
    by himself: still for a while, then listening for a while, and round

@@ -59,8 +59,11 @@ const EYES_SHUT = [
 
 /** One pixel of the 240-unit drawing, 21 pixels a side. */
 export const PIXEL = 240 / 21;
+const LOOK_STEP = PIXEL / 2;
 
-/** Where he looks, in pixels of the drawing: -1, 0 or 1 each way. */
+/** Where he looks: -1, 0 or 1 each way. The eyes move half a pixel of
+    the drawing that way, so they never meet a neighbouring square and
+    read as eyes all the while. */
 export interface Look {
   x: number;
   y: number;
@@ -70,7 +73,7 @@ const Eyes = ({ prefix, look }: { prefix: string; look?: Look }) => (
   <>
     <g
       className={`${prefix}eyes-open`}
-      style={look && (look.x || look.y) ? { transform: `translate(${look.x * PIXEL}px, ${look.y * PIXEL}px)` } : undefined}
+      style={look && (look.x || look.y) ? { transform: `translate(${look.x * LOOK_STEP}px, ${look.y * LOOK_STEP}px)` } : undefined}
     >
       {EYES_OPEN.map((d) => (
         <path key={d} d={d} />
