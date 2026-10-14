@@ -398,10 +398,8 @@
      pointer movement, or a tap) a slow song plays, animated as pixel art
      is: every change is a cut to the next frame (step-end), never a
      tween, and nothing hurries.
-     - Eyes: a blink first (open, half, shut, half, open, in a quarter
-       of a second), a glance to his left, then his right, then back, as
-       if to see who's there, then they close (half, shut) and stay shut
-       while the pointer stays. 2.4s in all.
+     - Eyes: open, half shut, shut, in under a second, then they stay
+       shut while the pointer stays.
      - The notes, heart and sparkles come in one after another over the
        first few seconds (appear, each for its own length), not all at
        once: the small note first, then the big one, then the pair; the
@@ -422,34 +420,34 @@
   }
   @media (prefers-reduced-motion: no-preference) {
     .hero-art[data-listening] .eyes-open {
-      animation: eyes-open 2.4s step-end forwards;
+      animation: eyes-open 1s step-end forwards;
     }
     .hero-art[data-listening] .eyes-half {
-      animation: eyes-half 2.4s step-end forwards;
+      animation: eyes-half 1s step-end forwards;
     }
     .hero-art[data-listening] .eyes-shut {
-      animation: eyes-shut 2.4s step-end forwards;
+      animation: eyes-shut 1s step-end forwards;
     }
     .hero-art[data-listening] .deco {
       animation: appear 1s linear forwards;
     }
     .hero-art[data-listening] .deco-note-c {
-      animation-duration: 2.4s;
+      animation-duration: 0.4s;
     }
     .hero-art[data-listening] .deco-heart {
-      animation-duration: 3s;
+      animation-duration: 1s;
     }
     .hero-art[data-listening] .deco-note-b {
-      animation-duration: 3.4s;
+      animation-duration: 1.4s;
     }
     .hero-art[data-listening] .deco-sparkle-a {
-      animation-duration: 4s;
+      animation-duration: 2s;
     }
     .hero-art[data-listening] .deco-note-a {
-      animation-duration: 4.4s;
+      animation-duration: 2.4s;
     }
     .hero-art[data-listening] .deco-sparkle-b {
-      animation-duration: 5s;
+      animation-duration: 3s;
     }
     /* The card is a piece of the page, not of the pixel art: it rises
        into place and sinks away, on the Zwap ease. The delay is set
@@ -465,13 +463,13 @@
       animation: note-rise 3.6s step-end infinite both;
     }
     .hero-art[data-listening] .note-c {
-      animation-delay: 2.4s;
+      animation-delay: 0.4s;
     }
     .hero-art[data-listening] .note-b {
-      animation-delay: 3.4s;
+      animation-delay: 1.4s;
     }
     .hero-art[data-listening] .note-a {
-      animation-delay: 4.4s;
+      animation-delay: 2.4s;
     }
     .hero-art[data-listening] .heart {
       animation: heart-beat 2.4s step-end infinite;
@@ -724,33 +722,19 @@
 }
 
 /* The portrait's frames (see .hero-art). */
-/* 2.4s. A blink in the first 8% (open, half 2–4, shut 4–6, half 6–8),
-   open and centred to 25%, a glance left (half a pixel) to 46%, right to
-   67%, centred to 79%, half shut to 85%, shut from there. The glance is
-   a transform on the open eyes alone; the shut eyes stay put. */
+/* 1s: open to 40%, half shut to 70%, shut from there. */
 @keyframes eyes-open {
-  0% { opacity: 1; transform: translateX(0); }
-  2% { opacity: 0; }
-  8% { opacity: 1; }
-  25% { transform: translateX(-5.7px); }
-  46% { transform: translateX(5.7px); }
-  67% { transform: translateX(0); }
-  79%, 100% { opacity: 0; }
+  0% { opacity: 1; }
+  40%, 100% { opacity: 0; }
 }
 @keyframes eyes-half {
   0% { opacity: 0; }
-  2% { opacity: 1; }
-  4% { opacity: 0; }
-  6% { opacity: 1; }
-  8% { opacity: 0; }
-  79% { opacity: 1; }
-  85%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+  70%, 100% { opacity: 0; }
 }
 @keyframes eyes-shut {
   0% { opacity: 0; }
-  4% { opacity: 1; }
-  6% { opacity: 0; }
-  85%, 100% { opacity: 1; }
+  70%, 100% { opacity: 1; }
 }
 /* The header mark's blink: 2.4s a loop, the blink in its first 12%. */
 @keyframes mark-eyes-open {
