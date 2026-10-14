@@ -2,32 +2,33 @@
 
 import { usePathname } from "next/navigation";
 import { PageLink } from "@/components/page-link";
-import { pages, profile } from "@/content/site";
+import { PortraitMark } from "@/components/pixel-art";
+import { homeLinks, pages, profile, resumeAvailable } from "@/content/site";
 
-/* The name, linking home, on the left; the nav on the right. The home page
-   has no header. */
+/* The figure, small, linking home, on the left; on the right, the other
+   page and Resume. The home page has no header. Until the résumé is up,
+   its link does nothing, and says so to a screen reader. */
 export function SiteHeader() {
   const pathname = usePathname();
-  const nav = [
-    { href: "/work", label: pages.work.title },
-    { href: "/experience", label: pages.experience.title },
-  ];
+  const other =
+    pathname === "/experience"
+      ? { href: "/work", label: homeLinks.work }
+      : { href: "/experience", label: pages.experience.navLabel };
 
   return (
     <header className="site-header">
-      <PageLink href="/" className="wordmark" aria-label="Praburaj Kennady home">
-        {profile.name}
+      <PageLink href="/" className="logo" aria-label={`${profile.fullName}, home`}>
+        <PortraitMark />
       </PageLink>
       <nav className="site-nav" aria-label="Site">
-        {nav.map(({ href, label }) => (
-          <PageLink
-            key={href}
-            href={href}
-            aria-current={pathname === href ? "page" : undefined}
-          >
-            {label}
-          </PageLink>
-        ))}
+        <PageLink href={other.href}>{other.label}</PageLink>
+        {resumeAvailable ? (
+          <a href="/resume/resume.pdf">{homeLinks.resume}</a>
+        ) : (
+          <button type="button" aria-disabled="true" title="Coming soon">
+            {homeLinks.resume}
+          </button>
+        )}
       </nav>
     </header>
   );

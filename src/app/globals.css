@@ -161,50 +161,57 @@
       max(20px, env(safe-area-inset-left));
   }
 
-  /* The name stands in for a logo: Black, in the text colour. */
-  .wordmark {
-    color: var(--text);
-    font-weight: 900;
-    text-decoration: none;
-  }
-
+  /* The header, from the Figma component: the figure, 44px, linking
+     home, on the left; the nav on the right; 16px under them, then the
+     line. 60px tall. */
   .site-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding-bottom: 20px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--line);
     view-transition-name: site-header;
   }
-  .site-header .wordmark {
-    font-size: 1.25rem; /* 20px */
-    line-height: 1.75rem;
-    letter-spacing: -0.3px;
-    white-space: nowrap;
+  .logo {
+    display: block;
+    width: 44px;
+    height: 44px;
+    color: var(--inverse);
     border-radius: 6px;
   }
+  .logo svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* The nav's links are Title 2, in the text colour, --text-2 under the
+     pointer; the one that is a button (Resume, until it exists) looks the
+     same. 24px apart, 8px of padding above and below. */
   .site-nav {
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 24px;
   }
-  .site-nav a {
-    color: var(--text-2);
+  .site-nav a,
+  .site-nav button {
+    font: inherit;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.5rem;
     font-weight: 700;
     text-decoration: none;
     padding: 8px 0;
     transition: color 150ms ease;
   }
   @media (hover: hover) and (pointer: fine) {
-    .site-nav a:hover {
-      color: var(--text);
+    .site-nav a:hover,
+    .site-nav button:hover {
+      color: var(--text-2);
     }
-  }
-  .site-nav a[aria-current="page"] {
-    color: var(--text);
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 6px;
   }
 
   .lede {
@@ -543,12 +550,6 @@
   @media (max-width: 480px) {
     .site-nav {
       gap: 16px;
-    }
-  }
-  /* Kept on one line, until the window is too narrow for it and the nav. */
-  @media (max-width: 360px) {
-    .site-header .wordmark {
-      white-space: normal;
     }
   }
 }

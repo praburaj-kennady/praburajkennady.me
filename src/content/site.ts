@@ -24,13 +24,16 @@ export const pages = {
   },
   experience: {
     title: "Experience",
+    /** How the header and the home page name it. */
+    navLabel: "More about me",
     lede: "Six years of product design, most of them at Zoho, with independent work alongside.",
   },
 };
 
 /** The footer's credit: "<site>, designed by <name>." with the name
     linking home. */
-/** The home page's pills, in order: Works, then Resume. */
+/** The home page's pills, in order: Works, then Resume. The header
+    uses the same words. */
 export const homeLinks = {
   work: "Works",
   resume: "Resume",
