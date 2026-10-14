@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { NowPlaying } from "@/app/api/now-playing/route";
 import { PixelPortrait } from "@/components/pixel-art";
 
@@ -31,17 +31,35 @@ const LISTEN_FOR = 7000; // ms a song lasts, with no pointer
 export function HeroPortrait({ className }: { className?: string }) {
   const [listening, setListening] = useState(false);
   const [track, setTrack] = useState<NowPlaying["track"]>(null);
-  const [card, setCard] = useState<"in" | "out" | null>(null);
+  const [delay, setDelay] = useState(0); // ms the card still waits once it may show
   // True where there is a pointer to hover with; false on a phone.
   const [hovers, setHovers] = useState(true);
   const from = useRef<{ x: number; y: number } | null>(null);
-  const since = useRef(0); // when he started listening
+
+  // The card comes while he listens to a playing track. When he stops it
+  // slides out: stop() notes the track whose card is up (kept in a ref
+  // by the effect below), and leaving holds it for the slide out.
+  const wanted = hovers && listening && !!track;
+  const shown = useRef<NowPlaying["track"]>(null);
+  const [leaving, setLeaving] = useState<{ track: NonNullable<NowPlaying["track"]> } | null>(null);
+  useEffect(() => {
+    shown.current = wanted ? track : null;
+  }, [wanted, track]);
+  useEffect(() => {
+    if (!leaving) return;
+    const gone = setTimeout(() => setLeaving(null), CARD_OUT);
+    return () => clearTimeout(gone);
+  }, [leaving]);
+  const stop = useCallback(() => {
+    setListening(false);
+    if (shown.current) setLeaving({ track: shown.current });
+    shown.current = null;
+  }, []);
 
   useEffect(() => {
-    const stop = () => setListening(false);
     window.addEventListener("blur", stop);
     return () => window.removeEventListener("blur", stop);
-  }, []);
+  }, [stop]);
 
   // With nothing to hover with, he takes turns resting and listening.
   useEffect(() => {
@@ -51,14 +69,15 @@ export function HeroPortrait({ className }: { className?: string }) {
     let on = false;
     const turn = () => {
       on = !on && !stillness.matches;
-      setListening(on);
+      if (on) setListening(true);
+      else stop();
       timer = window.setTimeout(turn, on ? LISTEN_FOR : STILL_FOR);
     };
     const start = () => {
       setHovers(canHover.matches);
       clearTimeout(timer);
       on = false;
-      setListening(false);
+      stop();
       if (!canHover.matches) timer = window.setTimeout(turn, STILL_FOR);
     };
     start();
@@ -67,33 +86,28 @@ export function HeroPortrait({ className }: { className?: string }) {
       canHover.removeEventListener("change", start);
       clearTimeout(timer);
     };
-  }, []);
+  }, [stop]);
 
   useEffect(() => {
     if (!listening || !hovers) return;
-    since.current = Date.now();
+    const since = Date.now();
     let live = true;
+    const got = (found: NowPlaying["track"]) => {
+      if (!live) return;
+      setTrack(found);
+      setDelay(Math.max(0, CARD_AT - (Date.now() - since)));
+    };
     fetch("/api/now-playing")
       .then((r) => (r.ok ? (r.json() as Promise<NowPlaying>) : { track: null }))
-      .then((data) => live && setTrack(data.track))
-      .catch(() => live && setTrack(null));
+      .then((data) => got(data.track))
+      .catch(() => got(null));
     return () => {
       live = false;
     };
-  }, [listening]);
+  }, [listening, hovers]);
 
-  // The card comes while he listens to a playing track, and leaves when
-  // either stops.
-  const wanted = hovers && listening && !!track;
-  useEffect(() => {
-    if (wanted) {
-      setCard("in");
-      return;
-    }
-    setCard((state) => (state === "in" ? "out" : state));
-    const gone = setTimeout(() => setCard(null), CARD_OUT);
-    return () => clearTimeout(gone);
-  }, [wanted]);
+  const card = wanted ? "in" : leaving ? "out" : null;
+  const up = wanted ? track : leaving?.track;
 
   return (
     <div className="hero-art-wrap">
@@ -111,28 +125,28 @@ export function HeroPortrait({ className }: { className?: string }) {
         onPointerLeave={(e) => {
           if (e.pointerType !== "mouse") return;
           from.current = null;
-          setListening(false);
+          stop();
         }}
       />
-      {card && track && (
+      {card && up && (
         <a
           className={`now-playing now-playing-${card}`}
-          style={card === "in" ? { animationDelay: `${Math.max(0, CARD_AT - (Date.now() - since.current))}ms` } : undefined}
-          href={track.url}
+          style={card === "in" ? { animationDelay: `${delay}ms` } : undefined}
+          href={up.url}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {track.art ? (
+          {up.art ? (
             // Spotify's CDN, a different URL per album: no next/image.
             // eslint-disable-next-line @next/next/no-img-element
-            <img className="now-playing-art" src={track.art} alt="" width={56} height={56} />
+            <img className="now-playing-art" src={up.art} alt="" width={56} height={56} />
           ) : (
             <span className="now-playing-art" aria-hidden="true" />
           )}
           <span className="now-playing-text">
             <span className="now-playing-label">Listening to</span>
-            <span className="now-playing-title">{track.title}</span>
-            <span className="now-playing-by">{track.artist}</span>
+            <span className="now-playing-title">{up.title}</span>
+            <span className="now-playing-by">{up.artist}</span>
           </span>
         </a>
       )}
