@@ -425,7 +425,7 @@
   }
   /* The card opens the song on Spotify. It reaches back across the 16px
      to the portrait, unseen, so the pointer can cross to it without
-     leaving the pair, and it lifts a touch under the pointer. */
+     leaving the pair, and it grows a touch under the pointer. */
   .now-playing::before {
     content: "";
     position: absolute;
@@ -440,7 +440,7 @@
       transition: transform 160ms var(--ease-out);
     }
     .now-playing:hover {
-      transform: translateY(-2px);
+      transform: scale(1.02);
     }
   }
   .now-playing-art {
