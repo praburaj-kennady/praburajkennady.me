@@ -44,6 +44,10 @@ export function HeroPortrait({ className }: { className?: string }) {
   // by the effect below), and leaving holds it for the slide out.
   const wanted = hovers && listening && !!track;
   const shown = useRef<NowPlaying["track"]>(null);
+  // Whether the card has actually come into view (its slide in has
+  // begun, after its wait): a card still waiting just goes, with no
+  // slide out, so a pass of the pointer shows nothing.
+  const arrived = useRef(false);
   const [leaving, setLeaving] = useState<{ track: NonNullable<NowPlaying["track"]> } | null>(null);
   useEffect(() => {
     shown.current = wanted ? track : null;
@@ -53,10 +57,20 @@ export function HeroPortrait({ className }: { className?: string }) {
     const gone = setTimeout(() => setLeaving(null), CARD_OUT);
     return () => clearTimeout(gone);
   }, [leaving]);
+  const dismiss = useCallback(() => {
+    if (shown.current && arrived.current) setLeaving({ track: shown.current });
+    shown.current = null;
+    arrived.current = false;
+  }, []);
   const stop = useCallback(() => {
     setListening(false);
-    if (shown.current) setLeaving({ track: shown.current });
-    shown.current = null;
+    dismiss();
+  }, [dismiss]);
+  // Each listen starts afresh: the last song's card is forgotten, so
+  // the card waits its CARD_AT from this hover, not the last one's.
+  const start = useCallback(() => {
+    setTrack(null);
+    setListening(true);
   }, []);
 
   useEffect(() => {
@@ -99,7 +113,7 @@ export function HeroPortrait({ className }: { className?: string }) {
       if (!live) return;
       // The same song again is the same card; a new one is a new card;
       // the music stopping sends the card off.
-      if (!found && shown.current) setLeaving({ track: shown.current });
+      if (!found) dismiss();
       setTrack((was) => (was && found && was.url === found.url ? was : found));
       setDelay(Math.max(0, CARD_AT - (Date.now() - since)));
     };
@@ -114,7 +128,7 @@ export function HeroPortrait({ className }: { className?: string }) {
       live = false;
       clearInterval(again);
     };
-  }, [listening, hovers]);
+  }, [listening, hovers, dismiss]);
 
   const card = wanted ? "in" : leaving ? "out" : null;
   const up = wanted ? track : leaving?.track;
@@ -129,7 +143,7 @@ export function HeroPortrait({ className }: { className?: string }) {
           if (!from.current) {
             from.current = { x: e.clientX, y: e.clientY };
           } else if (Math.hypot(e.clientX - from.current.x, e.clientY - from.current.y) >= NUDGE) {
-            setListening(true);
+            start();
           }
         }}
         onPointerLeave={(e) => {
@@ -143,6 +157,9 @@ export function HeroPortrait({ className }: { className?: string }) {
           key={up.url}
           className={`now-playing now-playing-${card}`}
           style={card === "in" ? { animationDelay: `${delay}ms` } : undefined}
+          onAnimationStart={(e) => {
+            if (e.animationName === "card-in") arrived.current = true;
+          }}
           href={up.url}
           target="_blank"
           rel="noopener noreferrer"
