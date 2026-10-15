@@ -134,28 +134,31 @@ export function HeroPortrait({ className }: { className?: string }) {
   const up = wanted ? track : leaving?.track;
 
   return (
-    <div className="hero-art-wrap">
-      <PixelPortrait
-        className={className}
-        data-listening={listening || undefined}
-        onPointerMove={(e) => {
-          if (e.pointerType !== "mouse" || listening) return;
-          if (!from.current) {
-            from.current = { x: e.clientX, y: e.clientY };
-          } else if (Math.hypot(e.clientX - from.current.x, e.clientY - from.current.y) >= NUDGE) {
-            start();
-          }
-        }}
-        onPointerLeave={(e) => {
-          if (e.pointerType !== "mouse") return;
-          from.current = null;
-          stop();
-        }}
-      />
+    // The pointer is watched over him and the card together, so moving
+    // across to the card (it bridges the gap; globals.css) keeps him
+    // listening and the card in reach to open the song.
+    <div
+      className="hero-art-wrap"
+      onPointerMove={(e) => {
+        if (e.pointerType !== "mouse" || listening) return;
+        if (!from.current) {
+          from.current = { x: e.clientX, y: e.clientY };
+        } else if (Math.hypot(e.clientX - from.current.x, e.clientY - from.current.y) >= NUDGE) {
+          start();
+        }
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType !== "mouse") return;
+        from.current = null;
+        stop();
+      }}
+    >
+      <PixelPortrait className={className} data-listening={listening || undefined} />
       {card && up && (
         <a
           key={up.url}
           className={`now-playing now-playing-${card}`}
+          title={`Open ${up.title} on Spotify`}
           style={card === "in" ? { animationDelay: `${delay}ms` } : undefined}
           onAnimationStart={(e) => {
             if (e.animationName === "card-in") arrived.current = true;
