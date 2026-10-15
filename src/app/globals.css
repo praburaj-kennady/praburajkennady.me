@@ -435,9 +435,13 @@
     width: 16px;
   }
   @media (prefers-reduced-motion: no-preference) {
-    /* transform, not translate: the arrival's keyframes hold translate. */
+    /* transform, not translate: the arrival's keyframes hold translate.
+       Its own layer throughout, so Safari repaints cleanly when it
+       goes mid-transition and leaves no sliver of its edge behind. */
     .now-playing {
       transition: transform 160ms var(--ease-out);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
     }
     .now-playing:hover {
       transform: scale(1.02);
