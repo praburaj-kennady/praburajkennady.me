@@ -8,7 +8,9 @@ import { PixelPortrait } from "@/components/pixel-art";
    A browser reports a pointer over the picture as soon as the page
    loads if the cursor happens to rest there, so :hover and pointerenter
    would start the song on their own. Instead he listens only once a
-   mouse has moved a few pixels over him, and stops when it leaves.
+   mouse has moved a few pixels over him, and stops LINGER after it
+   leaves, so the song and the card outlast a pass of the pointer; back
+   within that time and he just carries on.
 
    On a screen with nothing to hover with (a phone, a tablet) he plays
    by himself: still for a while, then listening for a while, and round
@@ -27,6 +29,7 @@ import { PixelPortrait } from "@/components/pixel-art";
 const NUDGE = 4; // px of movement that counts as the mouse arriving
 const CARD_AT = 2400; // ms after he starts listening that the card arrives
 const CARD_OUT = 220; // ms the card takes to leave
+const LINGER = 4000; // ms he keeps listening after the pointer leaves
 const POLL_EVERY = 10000; // ms between asking Spotify again while he listens
 const STILL_FOR = 4000; // ms he rests between songs, with no pointer
 const LISTEN_FOR = 7000; // ms a song lasts, with no pointer
@@ -38,6 +41,7 @@ export function HeroPortrait({ className }: { className?: string }) {
   // True where there is a pointer to hover with; false on a phone.
   const [hovers, setHovers] = useState(true);
   const from = useRef<{ x: number; y: number } | null>(null);
+  const linger = useRef(0); // the timer for stopping after the pointer leaves
 
   // The card comes while he listens to a playing track. When he stops it
   // slides out: stop() notes the track whose card is up (kept in a ref
@@ -63,9 +67,11 @@ export function HeroPortrait({ className }: { className?: string }) {
     arrived.current = false;
   }, []);
   const stop = useCallback(() => {
+    clearTimeout(linger.current);
     setListening(false);
     dismiss();
   }, [dismiss]);
+  useEffect(() => () => clearTimeout(linger.current), []);
   // Each listen starts afresh: the last song's card is forgotten, so
   // the card waits its CARD_AT from this hover, not the last one's.
   const start = useCallback(() => {
@@ -140,7 +146,11 @@ export function HeroPortrait({ className }: { className?: string }) {
     <div
       className="hero-art-wrap"
       onPointerMove={(e) => {
-        if (e.pointerType !== "mouse" || listening) return;
+        if (e.pointerType !== "mouse") return;
+        if (listening) {
+          clearTimeout(linger.current); // back in time: carry on
+          return;
+        }
         if (!from.current) {
           from.current = { x: e.clientX, y: e.clientY };
         } else if (Math.hypot(e.clientX - from.current.x, e.clientY - from.current.y) >= NUDGE) {
@@ -150,7 +160,8 @@ export function HeroPortrait({ className }: { className?: string }) {
       onPointerLeave={(e) => {
         if (e.pointerType !== "mouse") return;
         from.current = null;
-        stop();
+        clearTimeout(linger.current);
+        linger.current = window.setTimeout(stop, LINGER);
       }}
     >
       <PixelPortrait className={className} data-listening={listening || undefined} />
