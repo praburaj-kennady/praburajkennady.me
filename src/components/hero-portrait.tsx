@@ -29,7 +29,7 @@ import { PixelPortrait } from "@/components/pixel-art";
 const NUDGE = 4; // px of movement that counts as the mouse arriving
 const CARD_AT = 2400; // ms after he starts listening that the card arrives
 const CARD_OUT = 220; // ms the card takes to leave
-const LINGER = 4000; // ms he keeps listening after the pointer leaves
+const LINGER = 3000; // ms he keeps listening after the pointer leaves
 const POLL_EVERY = 10000; // ms between asking Spotify again while he listens
 const STILL_FOR = 4000; // ms he rests between songs, with no pointer
 const LISTEN_FOR = 7000; // ms a song lasts, with no pointer
