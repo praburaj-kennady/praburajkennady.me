@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function Work() {
   return (
     <PageTransition>
-      <div className="page page-fill">
+      <div className="page">
         <SiteHeader />
         <main>
           <h1>{pages.work.title}</h1>

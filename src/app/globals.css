@@ -167,7 +167,10 @@
 
 @layer components {
   /* One column, 640px of content (as the Figma Header and Footer),
-     centred. The page may draw under a phone's
+     centred. It is at least as tall as the window and the main content
+     takes the room left over, so on a page that fits, the footer sits at
+     the window's foot, as on the home page; on a page that scrolls it
+     follows the content, 40px under it. The page may draw under a phone's
      notch and home indicator (viewport-fit=cover, in layout.tsx), so its
      padding keeps the content clear of them. */
   .page {
@@ -176,8 +179,22 @@
     padding:
       max(28px, env(safe-area-inset-top))
       max(20px, env(safe-area-inset-right))
-      max(56px, env(safe-area-inset-bottom))
+      max(28px, env(safe-area-inset-bottom))
       max(20px, env(safe-area-inset-left));
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .page > main {
+    flex: 1;
+  }
+  /* The last thing on a page keeps no margin under it, so the footer's
+     40px is the whole gap. */
+  .page > main > :last-child,
+  .page > main > :last-child > :last-child,
+  .page > main > :last-child > :last-child > :last-child {
+    margin-bottom: 0;
   }
 
   /* The header, from the Figma component: the figure, 44px, linking
@@ -288,17 +305,6 @@
   .intro {
     margin: 0;
   }
-  /* The projects take the room left in the window, so the footer sits at
-     its foot, as in the frame; a longer list pushes it down. */
-  .page-fill {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    min-height: 100svh;
-  }
-  .page-fill main {
-    flex: 1;
-  }
   .projects {
     display: flex;
     flex-direction: column;
@@ -362,9 +368,6 @@
   .home {
     display: grid;
     grid-template-rows: 1fr auto 1fr;
-    min-height: 100vh;
-    min-height: 100svh;
-    padding-bottom: max(28px, env(safe-area-inset-bottom));
   }
   .home::before {
     content: "";
@@ -647,7 +650,7 @@
   /* The footer: the email on the left, the profiles on the right, as the
      header sets the name and the nav. */
   .site-footer {
-    margin-top: 56px;
+    margin-top: 40px;
     padding-top: 24px;
     border-top: 1px solid var(--line);
     font-size: 0.9375rem; /* 15px, Callout */
