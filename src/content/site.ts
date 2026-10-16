@@ -78,6 +78,14 @@ export const projects: Project[] = [
     tags: ["shipped", "case study", "write-up coming soon"],
   },
   {
+    slug: "retrie",
+    title: "Retrie",
+    blurb:
+      "Saves what you save, guesses why you saved it, and finds it again when you ask in plain words. A web app and a Chrome extension that catches your Bookmark and Save taps on X, Instagram, LinkedIn and more — now with a few people for feedback.",
+    meta: "Side project · Web app & Chrome extension · 2026",
+    tags: ["in progress"],
+  },
+  {
     slug: "collector",
     hidden: true,
     title: "Collector",
