@@ -17,6 +17,17 @@
   --muted: #6e6e73; /*  5.1:1 */
   --line: #e5e5ea; /* decorative only */
   --accent: #0657dc; /*  6.2:1 */
+  /* Text on the --inverse ground (the song card): the night's --text,
+     --text-2 and --muted by day, and the day's by night. */
+  --on-inverse: #f5f5f5;
+  --on-inverse-2: #aeaeb2;
+  --on-inverse-muted: #8a8a8f;
+  /* Which drawing of the figure shows (pixel-art.tsx, Figure): the
+     Logo component's Light variant by day, its Dark one by night. */
+  --figure-light: inline;
+  --figure-dark: none;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drift: cubic-bezier(0.16, 1, 0.3, 1); /* the Zwap app's moduleDrift */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -29,6 +40,11 @@
     --muted: #8a8a8f; /*  5.8:1 */
     --line: #38383a;
     --accent: #5896ff; /*  6.8:1 */
+    --on-inverse: #111111;
+    --on-inverse-2: #555555;
+    --on-inverse-muted: #6e6e73;
+    --figure-light: none;
+    --figure-dark: inline;
     color-scheme: dark;
   }
 }
@@ -41,6 +57,11 @@
   --muted: #8a8a8f;
   --line: #38383a;
   --accent: #5896ff;
+  --on-inverse: #111111;
+  --on-inverse-2: #555555;
+  --on-inverse-muted: #6e6e73;
+  --figure-light: none;
+  --figure-dark: inline;
   color-scheme: dark;
 }
 
@@ -129,6 +150,11 @@
     outline-offset: 3px;
     border-radius: 6px;
   }
+  /* After a change of page, its heading takes focus for a screen reader
+     to read on from (ArrivalFocus). It is not a control: no ring. */
+  h1[tabindex="-1"]:focus {
+    outline: none;
+  }
 
   @media (max-width: 480px) {
     h1 {
@@ -138,66 +164,742 @@
   }
 }
 
+
 @layer components {
-  /* The one page: a single message, centred in the window. It is pinned
-     to the visible window rather than sized from it, so on a phone it
-     never runs taller than the screen (100vh counts the space behind the
-     browser's toolbars in some browsers) and there is nothing to scroll. */
-  .holding {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    display: grid;
-    place-items: center;
-    /* Clear of the notch and the home indicator where a phone has them. */
+  /* One column, 640px of content (as the Figma Header and Footer),
+     centred. It is at least as tall as the window and the main content
+     takes the room left over, so on a page that fits, the footer sits at
+     the window's foot, as on the home page; on a page that scrolls it
+     follows the content, 40px under it. The page may draw under a phone's
+     notch and home indicator (viewport-fit=cover, in layout.tsx), so its
+     padding keeps the content clear of them. */
+  .page {
+    max-width: 42.5rem; /* 640px + 20px each side */
+    margin: 0 auto;
     padding:
       max(28px, env(safe-area-inset-top))
       max(20px, env(safe-area-inset-right))
       max(28px, env(safe-area-inset-bottom))
       max(20px, env(safe-area-inset-left));
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
   }
-  .holding h1 {
-    position: relative;
-    margin: 0;
-    animation: settle-in 1100ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+  .page > main {
+    flex: 1;
   }
-  @media (prefers-reduced-motion: reduce) {
-    .holding h1 {
-      animation: fade-in 800ms ease-out 100ms both;
+  /* The last thing on a page keeps no margin under it, so the footer's
+     40px is the whole gap. */
+  .page > main > :last-child,
+  .page > main > :last-child > :last-child,
+  .page > main > :last-child > :last-child > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* The header, from the Figma component: the figure, 44px, linking
+     home, on the left; the nav on the right; 16px under them, then the
+     line. 60px tall. */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    view-transition-name: site-header;
+    /* It stays at the top as the page scrolls under it, on the page's
+       ground. It takes the page's top padding as its own, pulled up by
+       as much, so nothing shows above it. */
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--base);
+    margin-top: calc(-1 * max(28px, env(safe-area-inset-top)));
+    padding-top: max(28px, env(safe-area-inset-top));
+  }
+  .logo {
+    display: block;
+    width: 44px;
+    height: 44px;
+    color: var(--inverse);
+    border-radius: 6px;
+  }
+  .logo svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* The figure's two drawings (pixel-art.tsx): one shows, by the theme.
+     The dark one's shut lid is a line in the ground colour. */
+  .figure-light {
+    display: var(--figure-light);
+  }
+  .figure-dark {
+    display: var(--figure-dark);
+  }
+  .figure-ground {
+    fill: var(--base);
+  }
+  /* Under the pointer the mark blinks, as pixel art does, in cuts: open,
+     half, shut, half, open in about a quarter of a second, then a pause,
+     every 2.4s while the pointer stays. */
+  .logo .mark-eyes-half,
+  .logo .mark-eyes-shut {
+    opacity: 0;
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .logo:hover .mark-eyes-open {
+      animation: mark-eyes-open 2.4s step-end infinite;
+    }
+    .logo:hover .mark-eyes-half {
+      animation: mark-eyes-half 2.4s step-end infinite;
+    }
+    .logo:hover .mark-eyes-shut {
+      animation: mark-eyes-shut 2.4s step-end infinite;
     }
   }
-  /* The field stops short of the left and right edges of the window. */
-  .holding-squares {
+  /* The nav's links are Title 2, in the text colour, --text-2 under the
+     pointer; the one that is a button (Resume, until it exists) looks the
+     same. 24px apart, 8px of padding above and below. */
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .site-nav a,
+  .site-nav button {
+    font: inherit;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 8px 0;
+    transition: color 150ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .site-nav a:hover,
+    .site-nav button:hover {
+      color: var(--text-2);
+    }
+  }
+
+  .lede {
+    font-size: 1.1875rem; /* 19px */
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 700;
+    margin: 0 0 24px;
+  }
+
+  /* The Work page, from the Figma frame. Under the heading, 6px down,
+     the line that opens it in Reading; 28px under that, the projects. */
+  .intro {
+    margin: 0;
+  }
+  .projects {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 28px;
+  }
+  /* The Project card: on the raised grey, 24px corners, 20px by 22px of
+     padding, 12px between its title, its line and its tags. The title in
+     Title 1 with where and when 4px under it in Callout, --muted. */
+  .project {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 22px;
+    border-radius: 24px;
+    background: var(--raised);
+  }
+  .project h2 {
+    margin: 0 0 4px;
+    font-size: 1.375rem; /* 22px, Title 1 */
+    line-height: 1.75rem;
+    letter-spacing: -0.2px;
+    font-weight: 700;
+  }
+  .project p {
+    margin: 0;
+  }
+  .project .project-meta {
+    color: var(--muted);
+    font-size: 0.9375rem; /* 15px, Callout */
+    line-height: 1.25rem;
+    font-weight: 600;
+  }
+  /* The Tag: a pill on the page's ground, Caption 1 in --text-2, 6px
+     apart, wrapping. */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .tags li {
+    margin: 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--base);
+    font-size: 0.75rem; /* 12px, Caption 1 */
+    line-height: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  /* The home page fills the window. Its hero stands in the middle of the
+     window, and the footer at the window's foot: three rows, the outer two
+     shared equally, so the hero stays centred while there is room. In a
+     window too short for that, the footer's row takes what it needs, the
+     hero rises, and the page scrolls; they never overlap. The page's
+     padding is even top and bottom here, so nothing nudges the centre. */
+  .home {
+    display: grid;
+    grid-template-rows: 1fr auto 1fr;
+  }
+  .home::before {
+    content: "";
+  }
+  .home .site-footer {
+    align-self: end;
+  }
+  .hero {
+    text-align: center;
+    padding: 28px 0;
+  }
+  /* The portrait over the first line, 40px above it: 240px square,
+     200px on a phone, in the --inverse colour. Its notes and sparkles
+     draw outside the square, above it, without taking up room. */
+  .hero-art {
+    display: block;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 40px;
+    color: var(--inverse);
+  }
+  @media (max-width: 480px) {
+    .hero-art {
+      width: 200px;
+      height: 200px;
+    }
+  }
+  /* The song card, from the Figma frame: beside his head, on the right,
+     16px off the portrait's right edge (256px in from its left) and
+     16px down. On the --inverse ground, 20px corners, the album art 56px with
+     12px corners, then "Listening to" in Caption 2, the title in Title 2
+     and the first artist in Caption 1, 12px off the art, each cut with
+     an ellipsis: the card is always 240px wide. It takes no room in the layout. On a
+     window too narrow for it beside the column it sits at the window's
+     foot instead, centred. */
+  .hero-art-wrap {
+    position: relative;
+    width: max-content;
+    margin: 0 auto;
+  }
+  .now-playing {
     position: absolute;
-    inset: 0 clamp(20px, 8vw, 128px);
-    width: calc(100% - 2 * clamp(20px, 8vw, 128px));
-    height: 100%;
-    pointer-events: none;
-    /* Fade the field out towards the left and right edges: clear at the
-       very edge, full only across the middle third. */
-    mask-image: linear-gradient(
-      to right,
-      transparent 4%,
-      #000 35%,
-      #000 65%,
-      transparent 96%
-    );
+    top: 16px;
+    left: 256px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 240px;
+    max-width: calc(100vw - 32px);
+    padding: 8px 12px 8px 8px;
+    border-radius: 20px;
+    background: var(--inverse);
+    color: var(--on-inverse);
+    text-decoration: none;
+    text-align: left;
+  }
+  /* The card opens the song on Spotify. It reaches back across the 16px
+     to the portrait, unseen, so the pointer can cross to it without
+     leaving the pair, and it grows a touch under the pointer. */
+  .now-playing::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -16px;
+    width: 16px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    /* transform, not translate: the arrival's keyframes hold translate.
+       Its own layer throughout, so Safari repaints cleanly when it
+       goes mid-transition and leaves no sliver of its edge behind. */
+    .now-playing {
+      transition: transform 160ms var(--ease-out);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+    }
+    .now-playing:hover {
+      transform: scale(1.02);
+    }
+  }
+  .now-playing-art {
+    flex: none;
+    display: block;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: var(--line);
+    object-fit: cover;
+  }
+  .now-playing-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .now-playing-title {
+    margin-top: 2px;
+  }
+  .now-playing-text > span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .now-playing-label {
+    font-size: 0.6875rem; /* 11px, Caption 2 */
+    line-height: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--on-inverse-muted);
+  }
+  .now-playing-title {
+    font-size: 1.125rem; /* 18px, Title 2 */
+    line-height: 1.5rem;
+    font-weight: 700;
+  }
+  .now-playing-by {
+    font-size: 0.75rem; /* 12px, Caption 1 */
+    line-height: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--on-inverse-2);
+  }
+  @media (max-width: 820px) {
+    .now-playing {
+      position: fixed;
+      top: auto;
+      left: 50%;
+      bottom: max(16px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+    }
+  }
+  /* At rest the portrait is the plain drawing: eyes open, nothing around
+     him. While he listens (data-listening, set by HeroPortrait from real
+     pointer movement, or a tap) a slow song plays, animated as pixel art
+     is: every change is a cut to the next frame (step-end), never a
+     tween, and nothing hurries.
+     - Eyes: open, half shut, shut, in under a second, then they stay
+       shut while the pointer stays.
+     - The notes, heart and sparkles come in one after another over the
+       first few seconds (appear, each for its own length), not all at
+       once: the small note first, then the big one, then the pair; the
+       song card last, once the notes are up.
+     - Notes: each rises past his ear a pixel step at a time and fades,
+       on its own beat, so there is always one in the air.
+     - Heart: a slow beat, one step up and back.
+     - Sparkles: a slow blink, out of step with each other.
+     Under Reduce Motion the song only shows the notes and the heart,
+     still, with his eyes open. */
+  .hero-art .deco,
+  .hero-art .eyes-half,
+  .hero-art .eyes-shut {
+    opacity: 0;
+  }
+  .hero-art[data-listening] .deco {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-art[data-listening] .eyes-open {
+      animation: eyes-open 1s step-end forwards;
+    }
+    .hero-art[data-listening] .eyes-half {
+      animation: eyes-half 1s step-end forwards;
+    }
+    .hero-art[data-listening] .eyes-shut {
+      animation: eyes-shut 1s step-end forwards;
+    }
+    .hero-art[data-listening] .deco {
+      animation: appear 1s linear forwards;
+    }
+    .hero-art[data-listening] .deco-note-c {
+      animation-duration: 0.4s;
+    }
+    .hero-art[data-listening] .deco-heart {
+      animation-duration: 1s;
+    }
+    .hero-art[data-listening] .deco-note-b {
+      animation-duration: 1.4s;
+    }
+    .hero-art[data-listening] .deco-sparkle-a {
+      animation-duration: 2s;
+    }
+    .hero-art[data-listening] .deco-note-a {
+      animation-duration: 2.4s;
+    }
+    .hero-art[data-listening] .deco-sparkle-b {
+      animation-duration: 3s;
+    }
+    /* The card is a piece of the page, not of the pixel art: it rises
+       into place and sinks away, on the Zwap ease. The delay is set
+       inline (HeroPortrait), so it lands after the notes. */
+    .now-playing-in {
+      animation: card-in 280ms var(--ease-out) both;
+    }
+    .now-playing-out {
+      animation: card-out 220ms ease-in forwards;
+      pointer-events: none;
+    }
+    .hero-art[data-listening] .note {
+      animation: note-rise 3.6s step-end infinite both;
+    }
+    .hero-art[data-listening] .note-c {
+      animation-delay: 0.4s;
+    }
+    .hero-art[data-listening] .note-b {
+      animation-delay: 1.4s;
+    }
+    .hero-art[data-listening] .note-a {
+      animation-delay: 2.4s;
+    }
+    .hero-art[data-listening] .heart {
+      animation: heart-beat 2.4s step-end infinite;
+    }
+    .hero-art[data-listening] .blink {
+      animation: blink 2.4s step-end infinite;
+    }
+    .hero-art[data-listening] .blink-b {
+      animation-delay: -1.2s;
+    }
+  }
+  /* The first line, set in Title 1; the line under it in Reading. */
+  .hero .lede {
+    font-size: 1.375rem; /* 22px */
+    line-height: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    white-space: pre-line; /* breaks where the Figma frame does */
+    margin: 0 0 12px;
+  }
+  .hero .lede + p {
+    margin: 0;
+  }
+  .hero h1 {
+    margin: 0 0 12px;
+  }
+
+  /* A row of grey pills, to the other pages. */
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 32px 0 0;
+  }
+  .links a,
+  .links button {
+    font: inherit;
+    border: 0;
+    cursor: pointer;
+    background: var(--raised);
+    color: var(--text);
+    font-size: 1.125rem; /* 18px, Title 2 */
+    line-height: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 999px;
+    transition:
+      background-color 150ms ease,
+      transform 160ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .links a:hover,
+    .links button:hover {
+      background: var(--line);
+    }
+  }
+  .links a:active,
+  .links button:active {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .links a:active,
+    .links button:active {
+      transform: none;
+    }
+  }
+
+  /* The footer: the email on the left, the profiles on the right, as the
+     header sets the name and the nav. */
+  .site-footer {
+    view-transition-name: site-footer;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 0.9375rem; /* 15px, Callout */
+    line-height: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .site-footer p {
+    margin: 0;
+  }
+  .site-footer a {
+    color: var(--text-2);
+  }
+  .socials {
+    display: flex;
+    gap: 24px;
+  }
+  .socials a {
+    display: block;
+    color: var(--inverse);
+    border-radius: 2px;
+  }
+  .socials svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+  }
+
+  @media (max-width: 480px) {
+    .site-nav {
+      gap: 16px;
+    }
   }
 }
 
-/* The message settles in once, when the page is first shown: it rises a
-   few pixels and comes into focus as it fades in. Under Reduce Motion it
-   only fades. */
-@keyframes settle-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-    filter: blur(6px);
+/* ————————————————————————————————————————————————————————————————
+   Page transitions, from the Zwap site. The header is one fixed layer:
+   it never moves with a page or scales, and only the content under it
+   changes.
+   - Between Work and Experience the content changes as the Zwap app's
+     tabs do: a 0.1s crossfade while the old content drifts 32px towards
+     its side of the nav and the new comes in 32px from its own, landing
+     in 0.25s.
+   - To or from the home page, the old content scales down and fades out,
+     and the new zooms in to its size as it fades in after it.
+   PageLink names the kind of change, and PageTransition turns the name
+   into a class on the content. A change with no name (Back, Forward), or
+   any change under Reduce Motion, only crossfades.
+   ———————————————————————————————————————————————————————————————— */
+
+/* What shows around the content while it is scaled down or moved aside.
+   Clicks pass through to the page underneath. */
+::view-transition {
+  background: var(--base);
+  pointer-events: none;
+}
+/* The rest of the page, behind the content, changes at once. */
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+/* The header keeps still, and so does the footer where both pages show
+   it. Each is drawn from the new page from the first frame; where it
+   stands a little apart on the two pages, it glides to its new place. */
+::view-transition-group(site-header),
+::view-transition-group(site-footer) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-old(site-header),
+::view-transition-old(site-footer) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(site-header),
+::view-transition-new(site-footer) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* The content crossfades: 0.1s ease-out, the app's moduleFade. Where only
+   one of the two pages has a header (the home page has none), it fades
+   where it stands, with the content. */
+::view-transition-old(.page-fade),
+::view-transition-old(.zoom),
+::view-transition-old(.slide-forward),
+::view-transition-old(.slide-backward),
+::view-transition-old(site-header):only-child,
+::view-transition-old(site-footer):only-child {
+  animation: page-out 100ms ease-out both;
+  opacity: 1;
+}
+::view-transition-new(.page-fade),
+::view-transition-new(.zoom),
+::view-transition-new(.slide-forward),
+::view-transition-new(.slide-backward),
+::view-transition-new(site-header):only-child,
+::view-transition-new(site-footer):only-child {
+  animation: page-in 100ms ease-out both;
+}
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(.slide-forward) {
+    animation:
+      page-out 100ms ease-out both,
+      drift-to-left 250ms var(--ease-drift) both;
+  }
+  ::view-transition-new(.slide-forward) {
+    animation:
+      page-in 100ms ease-out both,
+      drift-from-right 250ms var(--ease-drift) both;
+  }
+  ::view-transition-old(.slide-backward) {
+    animation:
+      page-out 100ms ease-out both,
+      drift-to-right 250ms var(--ease-drift) both;
+  }
+  ::view-transition-new(.slide-backward) {
+    animation:
+      page-in 100ms ease-out both,
+      drift-from-left 250ms var(--ease-drift) both;
+  }
+  ::view-transition-old(.zoom) {
+    animation:
+      page-out 150ms linear both,
+      zoom-out 150ms ease both;
+  }
+  ::view-transition-new(.zoom) {
+    animation:
+      page-in 180ms var(--ease-out) 90ms both,
+      zoom-in 270ms var(--ease-out) 90ms both;
+  }
+  :root:active-view-transition-type(zoom)::view-transition-old(site-header):only-child,
+  :root:active-view-transition-type(zoom)::view-transition-old(site-footer):only-child {
+    animation: page-out 150ms linear both;
+  }
+  :root:active-view-transition-type(zoom)::view-transition-new(site-header):only-child,
+  :root:active-view-transition-type(zoom)::view-transition-new(site-footer):only-child {
+    animation: page-in 180ms var(--ease-out) 90ms both;
   }
 }
-@keyframes fade-in {
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-in {
   from {
     opacity: 0;
   }
+}
+@keyframes drift-to-left {
+  to {
+    transform: translateX(-32px);
+  }
+}
+@keyframes drift-from-right {
+  from {
+    transform: translateX(32px);
+  }
+}
+@keyframes drift-to-right {
+  to {
+    transform: translateX(32px);
+  }
+}
+@keyframes drift-from-left {
+  from {
+    transform: translateX(-32px);
+  }
+}
+@keyframes zoom-out {
+  to {
+    transform: scale(0.94);
+  }
+}
+@keyframes zoom-in {
+  from {
+    transform: scale(0.92);
+  }
+}
+
+/* The portrait's frames (see .hero-art). */
+/* 1s: open to 40%, half shut to 70%, shut from there. */
+@keyframes eyes-open {
+  0% { opacity: 1; }
+  40%, 100% { opacity: 0; }
+}
+@keyframes eyes-half {
+  0% { opacity: 0; }
+  40% { opacity: 1; }
+  70%, 100% { opacity: 0; }
+}
+@keyframes eyes-shut {
+  0% { opacity: 0; }
+  70%, 100% { opacity: 1; }
+}
+/* The header mark's blink: 2.4s a loop, the blink in its first 12%. */
+@keyframes mark-eyes-open {
+  0% { opacity: 1; }
+  2% { opacity: 0; }
+  12%, 100% { opacity: 1; }
+}
+@keyframes mark-eyes-half {
+  0% { opacity: 0; }
+  2% { opacity: 1; }
+  5% { opacity: 0; }
+  9% { opacity: 1; }
+  12%, 100% { opacity: 0; }
+}
+@keyframes mark-eyes-shut {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  9%, 100% { opacity: 0; }
+}
+/* Hidden until the end, then shown: a cut, with the shown state as the
+   last keyframe so it holds. Each thing runs it for its own length. */
+@keyframes appear {
+  0%, 99.9% { opacity: 0; }
+  100% { opacity: 1; }
+}
+/* The song card's arrival and leaving. `translate` keeps clear of the
+   transform that centres it on a phone. */
+@keyframes card-in {
+  from { opacity: 0; translate: 0 12px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes card-out {
+  to { opacity: 0; translate: 0 12px; }
+}
+/* A note rises four pixel steps and fades. */
+@keyframes note-rise {
+  0% { opacity: 0; transform: translateY(8px); }
+  5% { opacity: 1; transform: translateY(8px); }
+  25% { transform: translateY(4px); }
+  45% { transform: translateY(0); }
+  65% { transform: translateY(-4px); }
+  80% { opacity: 1; transform: translateY(-8px); }
+  82%, 100% { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes heart-beat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  60% { opacity: 0; }
 }

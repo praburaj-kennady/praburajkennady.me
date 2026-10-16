@@ -7,13 +7,47 @@
 
 export const profile = {
   name: "praburaj kennady",
-  tagline: "Product designer shipping designs into products with AI.",
+  /** The home page's heading, for screen readers; it is not shown. */
+  fullName: "Praburaj Kennady",
+  /** The first line, broken where the Figma frame breaks it. */
+  tagline:
+    "Praburaj Kennady, Product Designer & Builder\nshipping initiative ideas into usable products with AI.",
   taglineDetail:
-    "Five years across consumer and enterprise, on Android, iOS, and TV.",
-  email: "praburajkennady.design@gmail.com",
+    "Currently working at Zoho with 6 years of experience across enterprise and consumer products, on iOS, Android, and TV.",
+  email: "hello@praburajkennady.me",
 };
 
-/** Flip to true once public/resume/resume.pdf exists. */
+/** The pages, in the nav's order, with the line that opens each. */
+export const pages = {
+  work: {
+    title: "Works",
+    lede: "What I've shipped, what's in progress, and what I make for the craft of it.",
+  },
+  experience: {
+    title: "Experience",
+    /** How the header and the home page name it. */
+    navLabel: "More about me",
+    lede: "Six years of product design, most of them at Zoho, with independent work alongside.",
+  },
+};
+
+/** The footer's credit: "<site>, designed by <name>." with the name
+    linking home. */
+/** The home page's pills, in order: Works, then Resume. The header
+    uses the same words. */
+export const homeLinks = {
+  work: "Works",
+  resume: "Resume",
+};
+
+/** Profiles linked from the footer. */
+export const socials = [
+  { name: "X", href: "https://x.com/praburajkennady" },
+  { name: "LinkedIn", href: "https://www.linkedin.com/in/praburajkennady/" },
+] as const;
+
+/** Flip to true once public/resume/resume.pdf exists: the Resume pill
+    then links to it. */
 export const resumeAvailable = false;
 
 export type Tag =
@@ -29,6 +63,9 @@ export interface Project {
   blurb: string;
   meta: string; // "company · period" line
   tags: Tag[];
+  /** Kept off the Work page for now: the Figma frame shows only the
+      projects without it. Delete the line to list it again. */
+  hidden?: true;
 }
 
 export const projects: Project[] = [
@@ -41,7 +78,16 @@ export const projects: Project[] = [
     tags: ["shipped", "case study", "write-up coming soon"],
   },
   {
+    slug: "retrie",
+    title: "Retrie",
+    blurb:
+      "Saves what you save, guesses why you saved it, and finds it again when you ask in plain words. A web app and a Chrome extension that catches your Bookmark and Save taps on X, Instagram, LinkedIn and more — now with a few people for feedback.",
+    meta: "Side project · Web app & Chrome extension · 2026",
+    tags: ["in progress"],
+  },
+  {
     slug: "collector",
+    hidden: true,
     title: "Collector",
     blurb:
       "Multi-vendor food-court ordering — scan a table QR, order from every stall in one cart, pay once. Design system, flows and sticker-collecting gamification, in progress.",
@@ -50,6 +96,7 @@ export const projects: Project[] = [
   },
   {
     slug: "zero-to-mvp",
+    hidden: true,
     title: "Zero to MVP, in a month",
     blurb:
       "A one-month freelance engagement for a US startup — took a founder's idea to a shipped MVP, end to end.",
@@ -58,6 +105,7 @@ export const projects: Project[] = [
   },
   {
     slug: "zwap",
+    hidden: true,
     title: "Zwap",
     blurb:
       "Currency, units and time zones in one playful, primary-palette iOS app. Designed in Figma, built by directing Claude — headed for the App Store.",
