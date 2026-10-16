@@ -650,6 +650,7 @@
   /* The footer: the email on the left, the profiles on the right, as the
      header sets the name and the nav. */
   .site-footer {
+    view-transition-name: site-footer;
     margin-top: 40px;
     padding-top: 24px;
     border-top: 1px solid var(--line);
@@ -716,18 +717,21 @@
 ::view-transition-new(root) {
   animation: none;
 }
-/* The header keeps still. It is drawn from the new page from the first
-   frame; where the old page was scrolled a little, it glides back to its
-   place. */
-::view-transition-group(site-header) {
+/* The header keeps still, and so does the footer where both pages show
+   it. Each is drawn from the new page from the first frame; where it
+   stands a little apart on the two pages, it glides to its new place. */
+::view-transition-group(site-header),
+::view-transition-group(site-footer) {
   animation-duration: 200ms;
   animation-timing-function: var(--ease-out);
 }
-::view-transition-old(site-header) {
+::view-transition-old(site-header),
+::view-transition-old(site-footer) {
   animation: none;
   opacity: 0;
 }
-::view-transition-new(site-header) {
+::view-transition-new(site-header),
+::view-transition-new(site-footer) {
   animation: none;
   mix-blend-mode: normal;
 }
@@ -739,7 +743,8 @@
 ::view-transition-old(.zoom),
 ::view-transition-old(.slide-forward),
 ::view-transition-old(.slide-backward),
-::view-transition-old(site-header):only-child {
+::view-transition-old(site-header):only-child,
+::view-transition-old(site-footer):only-child {
   animation: page-out 100ms ease-out both;
   opacity: 1;
 }
@@ -747,7 +752,8 @@
 ::view-transition-new(.zoom),
 ::view-transition-new(.slide-forward),
 ::view-transition-new(.slide-backward),
-::view-transition-new(site-header):only-child {
+::view-transition-new(site-header):only-child,
+::view-transition-new(site-footer):only-child {
   animation: page-in 100ms ease-out both;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -781,10 +787,12 @@
       page-in 180ms var(--ease-out) 90ms both,
       zoom-in 270ms var(--ease-out) 90ms both;
   }
-  :root:active-view-transition-type(zoom)::view-transition-old(site-header):only-child {
+  :root:active-view-transition-type(zoom)::view-transition-old(site-header):only-child,
+  :root:active-view-transition-type(zoom)::view-transition-old(site-footer):only-child {
     animation: page-out 150ms linear both;
   }
-  :root:active-view-transition-type(zoom)::view-transition-new(site-header):only-child {
+  :root:active-view-transition-type(zoom)::view-transition-new(site-header):only-child,
+  :root:active-view-transition-type(zoom)::view-transition-new(site-footer):only-child {
     animation: page-in 180ms var(--ease-out) 90ms both;
   }
 }

@@ -34,13 +34,19 @@ export function PageLink({ href, onClick, ...props }: PageLinkProps) {
       href={href}
       transitionTypes={types}
       onClick={(event) => {
-        // The header is one fixed layer in every change. Only one scrolled
+        // The header and the footer are fixed layers in every change. One
         // out of view takes no part: it would fly across the page to its
-        // place.
+        // place. (The new page's footer decides for itself: SiteFooter.)
         const bar = document.querySelector<HTMLElement>(".site-header");
         if (bar) {
           bar.style.viewTransitionName =
             bar.getBoundingClientRect().bottom <= 0 ? "none" : "";
+        }
+        const foot = document.querySelector<HTMLElement>(".site-footer");
+        if (foot) {
+          const { top, bottom } = foot.getBoundingClientRect();
+          foot.style.viewTransitionName =
+            bottom <= 0 || top >= window.innerHeight ? "none" : "";
         }
         onClick?.(event);
       }}
