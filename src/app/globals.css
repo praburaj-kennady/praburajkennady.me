@@ -85,6 +85,23 @@
   html {
     -webkit-text-size-adjust: 100%;
     scrollbar-gutter: stable;
+    /* No grey flash on a tap: each control shows its own press. */
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Controls, not content: a tap fires at once (no double-tap wait),
+     and a long press neither selects their label nor pops a callout.
+     Body text and the email stay selectable. */
+  .logo,
+  .site-nav a,
+  .site-nav button,
+  .links a,
+  .links button,
+  .socials a,
+  .now-playing {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
   body {
     margin: 0;
@@ -248,7 +265,7 @@
   .logo .mark-eyes-shut {
     opacity: 0;
   }
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     .logo:hover .mark-eyes-open {
       animation: mark-eyes-open 2.4s step-end infinite;
     }
@@ -286,6 +303,10 @@
     .site-nav button:hover {
       color: var(--text-2);
     }
+  }
+  .site-nav a:active,
+  .site-nav button:active {
+    color: var(--text-2);
   }
 
   .lede {
@@ -446,8 +467,13 @@
       will-change: transform, opacity;
       backface-visibility: hidden;
     }
-    .now-playing:hover {
-      transform: scale(1.02);
+    @media (hover: hover) and (pointer: fine) {
+      .now-playing:hover {
+        transform: scale(1.02);
+      }
+    }
+    .now-playing:active {
+      transform: scale(0.98);
     }
   }
   .now-playing-art {
@@ -676,6 +702,15 @@
     display: block;
     color: var(--inverse);
     border-radius: 2px;
+    transition: transform 120ms var(--ease-out);
+  }
+  .socials a:active {
+    transform: scale(0.92);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .socials a:active {
+      transform: none;
+    }
   }
   .socials svg {
     display: block;
