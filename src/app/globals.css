@@ -242,6 +242,10 @@
     color: var(--inverse);
     border-radius: 6px;
   }
+  /* Pressed, it dims, as the nav does. */
+  .logo:active {
+    opacity: 0.6;
+  }
   .logo svg {
     display: block;
     width: 100%;
@@ -403,7 +407,11 @@
   /* The portrait over the first line, 40px above it: 240px square,
      200px on a phone, in the --inverse colour. Its notes and sparkles
      draw outside the square, above it, without taking up room. */
+  /* A drawing, not text: a long press on it selects nothing. */
   .hero-art {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
     display: block;
     width: 240px;
     height: 240px;
